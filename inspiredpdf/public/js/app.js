@@ -1,115 +1,53 @@
-// Open IndexedDB database connection
-function openDB() {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFunctions } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDUUb-wEXLy1YYe8iauxeehHSn-Jg-k9KY",
+  authDomain: "inspiredpdf.firebaseapp.com",
+  projectId: "inspiredpdf",
+  storageBucket: "inspiredpdf.firebasestorage.app",
+  messagingSenderId: "433590225047",
+  appId: "1:433590225047:web:292fb6d27df589040601d2",
+  measurementId: "G-3KLS4M3YSZ"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
+const functions = getFunctions(app);
+
+// Silently sign in anonymously
+async function initAuth() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("InspiredPDF_LocalDB", 1);
-    request.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains("documents")) {
-        db.createObjectStore("documents", { keyPath: "id" });
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      unsubscribe();
+      if (user) {
+        localStorage.setItem('inspiredpdf_userId', user.uid);
+        console.log("User is signed in anonymously:", user.uid);
+        resolve(user);
+      } else {
+        signInAnonymously(auth)
+          .then((cred) => {
+            localStorage.setItem('inspiredpdf_userId', cred.user.uid);
+            console.log("Newly signed in anonymously:", cred.user.uid);
+            resolve(cred.user);
+          })
+          .catch((err) => {
+            console.error("Anonymous authentication failed:", err);
+            reject(err);
+          });
       }
-      if (!db.objectStoreNames.contains("edits")) {
-        db.createObjectStore("edits", { keyPath: "docId" });
-      }
-    };
-    request.onsuccess = (e) => resolve(e.target.result);
-    request.onerror = (e) => reject(e.target.error);
-  });
-}
-
-// Save document metadata and array buffer bytes locally
-export async function saveDocument(docId, fileName, fileSize, fileBytes, analysis) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction("documents", "readwrite");
-    const store = transaction.objectStore("documents");
-    const request = store.put({
-      id: docId,
-      fileName,
-      fileSize,
-      fileBytes,
-      analysis,
-      status: "ready"
     });
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
   });
 }
 
-// Get document metadata and bytes locally
-export async function getDocument(docId) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction("documents", "readonly");
-    const store = transaction.objectStore("documents");
-    const request = store.get(docId);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+// Start auth process immediately
+const authPromise = initAuth();
 
-// Get all edits for a document locally
-export async function getEdits(docId) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction("edits", "readonly");
-    const store = transaction.objectStore("edits");
-    const request = store.get(docId);
-    request.onsuccess = () => {
-      resolve(request.result ? request.result.edits : {});
-    };
-    request.onerror = () => reject(request.error);
-  });
-}
-
-// Save a single text edit locally
-export async function saveEdit(docId, blockId, editObj) {
-  const db = await openDB();
-  const currentEdits = await getEdits(docId);
-  currentEdits[blockId] = editObj;
-  
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction("edits", "readwrite");
-    const store = transaction.objectStore("edits");
-    const request = store.put({
-      docId: docId,
-      edits: currentEdits
-    });
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-}
-
-// Local font heuristic mapper
-export function mapFontToGoogleFont(fontName) {
-  if (!fontName || fontName === 'Unknown') return 'Inter';
-  
-  let cleanName = fontName;
-  if (fontName.includes('+')) {
-    cleanName = fontName.split('+')[1];
-  }
-  cleanName = cleanName.split('-')[0].split(',')[0].toLowerCase().trim();
-  
-  if (cleanName.includes('arial') || cleanName.includes('helvetica') || cleanName.includes('sans')) {
-    return 'Inter';
-  }
-  if (cleanName.includes('times') || cleanName.includes('georgia') || cleanName.includes('serif') || cleanName.includes('roman')) {
-    return 'Merriweather';
-  }
-  if (cleanName.includes('courier') || cleanName.includes('mono') || cleanName.includes('consolas')) {
-    return 'Roboto Mono';
-  }
-  if (cleanName.includes('roboto')) {
-    return 'Roboto';
-  }
-  if (cleanName.includes('lato')) {
-    return 'Lato';
-  }
-  if (cleanName.includes('montserrat')) {
-    return 'Montserrat';
-  }
-  if (cleanName.includes('poppins')) {
-    return 'Poppins';
-  }
-  
-  return 'Inter';
-}
+export { app, db, storage, auth, functions, authPromise };

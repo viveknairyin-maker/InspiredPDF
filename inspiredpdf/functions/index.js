@@ -24,58 +24,53 @@ configureGenkit({
  */
 async function downloadGoogleFontTtf(fontFamily, isBold = false, isItalic = false) {
   const formattedFont = fontFamily.replace(/\s+/g, '+');
-  let fontBytes = null;
   
-  // Try Googlebot User-Agent on css2 endpoint first
+  // Construct family URL with bold/italic variant if requested
+  const variants = [];
+  if (isItalic) variants.push('ital');
+  variants.push('wght');
+  
+  const variantString = variants.length > 0 ? `:${variants.join(',')}@${isItalic ? '1,' : ''}${isBold ? '700' : '400'}` : '';
+  const cssUrl = `https://fonts.googleapis.com/css2?family=${formattedFont}${variantString}&display=swap`;
+  
   try {
-    const cssUrl = `https://fonts.googleapis.com/css2?family=${formattedFont}:${isBold ? 'ital,wght@1,700' : 'wght@400'}`;
-    console.log(`Fetching CSS for font ${fontFamily} via Googlebot from url: ${cssUrl}`);
+    console.log(`Fetching CSS for font ${fontFamily} from url: ${cssUrl}`);
     const cssResponse = await axios.get(cssUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot)'
+      headers: { 
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
       }
     });
-    const cssText = cssResponse.data;
+    const ttfMatch = cssResponse.data.match(/src: url\(([^)]+\.ttf)\)/);
+    const woffMatch = cssResponse.data.match(/src: url\(([^)]+\.woff2)\)/);
+    const fontUrl = ttfMatch ? ttfMatch[1] : (woffMatch ? woffMatch[1] : null);
     
-    // Parse the .ttf URL from the CSS response
-    let fontUrlMatch = cssText.match(/url\((https:\/\/[^)]+\.ttf)\)/);
-    if (!fontUrlMatch) {
-      fontUrlMatch = cssText.match(/url\((https:\/\/[^)]+)\)/); // Grab any URL as fallback
-    }
-    
-    if (fontUrlMatch) {
-      const fontUrl = fontUrlMatch[1];
-      console.log(`Downloading font from Googlebot parsed URL: ${fontUrl}`);
+    if (fontUrl) {
+      console.log(`Downloading font from direct URL: ${fontUrl}`);
       const fontResponse = await axios.get(fontUrl, { responseType: 'arraybuffer' });
-      fontBytes = fontResponse.data;
+      return fontResponse.data;
     }
   } catch (error) {
-    console.warn(`Failed to retrieve font using Googlebot UA: ${error.message}`);
+    console.warn(`Failed to fetch custom variant CSS: ${error.message}`);
   }
   
-  // Fallback to standard Firefox UA to guarantee TTF download
-  if (!fontBytes) {
-    const fallbackUa = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1';
-    const cssUrlV1 = `https://fonts.googleapis.com/css?family=${formattedFont}:${isBold ? '700' : '400'}${isItalic ? 'i' : ''}`;
-    console.log(`Falling back to Firefox UA for TTF URL: ${cssUrlV1}`);
-    
-    try {
-      const cssResponse = await axios.get(cssUrlV1, { headers: { 'User-Agent': fallbackUa } });
-      const cssText = cssResponse.data;
-      const fontUrlMatch = cssText.match(/url\((https:\/\/[^)]+\.ttf)\)/) || cssText.match(/url\((https:\/\/[^)]+)\)/);
-      if (!fontUrlMatch) {
-        throw new Error(`Font URL not found in CSS for ${fontFamily}`);
-      }
-      const fontUrl = fontUrlMatch[1];
-      const fontResponse = await axios.get(fontUrl, { responseType: 'arraybuffer' });
-      fontBytes = fontResponse.data;
-    } catch (fallbackError) {
-      console.error(`Fallback font download failed:`, fallbackError.message);
-      throw fallbackError;
+  // Generic family fallback if custom variant fails
+  const genericCssUrl = `https://fonts.googleapis.com/css2?family=${formattedFont}&display=swap`;
+  console.log(`Falling back to generic CSS URL: ${genericCssUrl}`);
+  const cssResponse = await axios.get(genericCssUrl, {
+    headers: { 
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
     }
+  });
+  const ttfMatch = cssResponse.data.match(/src: url\(([^)]+\.ttf)\)/);
+  const woffMatch = cssResponse.data.match(/src: url\(([^)]+\.woff2)\)/);
+  const fontUrl = ttfMatch ? ttfMatch[1] : (woffMatch ? woffMatch[1] : null);
+  
+  if (!fontUrl) {
+    throw new Error(`Font URL not found in CSS for ${fontFamily}`);
   }
   
-  return fontBytes;
+  const fontResponse = await axios.get(fontUrl, { responseType: 'arraybuffer' });
+  return fontResponse.data;
 }
 
 /**
@@ -142,7 +137,7 @@ exports.analyzePDF = onDocumentCreated({
         const x = transform[4];
         const y = transform[5];
         // Enforce Task 4: fontSize is Math.abs(item.transform[0])
-        const fontSize = Math.abs(transform[0]);
+        const fontSize = Math.sqrt(transform[0] * transform[0] + transform[1] * transform[1]);
         const originalFont = item.fontName || 'Unknown';
         
         let fontName = originalFont;
@@ -208,10 +203,24 @@ exports.analyzePDF = onDocumentCreated({
       
       try {
         console.log(`Calling Genkit AI for font: ${cleanFontName}`);
-        // Enforce Task 4 Genkit AI Prompt phrasing
         const response = await generate({
           model: gemini15Flash,
-          prompt: `A PDF uses a font internally named '${cleanFontName}'. What is the single closest matching Google Font available at fonts.google.com? Reply with ONLY the Google Font name, nothing else.`
+          prompt: `You are a typography expert. A PDF document uses an internal font named "${cleanFontName}". Internal PDF font names are often technical (e.g., "AAAAAB+Helvetica-Bold", "TimesNewRoman,Bold", "g_d0_f1").
+
+Your job:
+1. Strip any prefix codes (like "AAAAAB+") and suffixes.
+2. Identify the base font family name.
+3. Return the single closest Google Font available on fonts.google.com.
+
+Rules:
+- If it looks like Helvetica or Arial → return "Inter"
+- If it looks like Times New Roman or a serif → return "Merriweather"  
+- If it looks like a geometric sans → return "DM Sans"
+- If it looks like a monospace → return "JetBrains Mono"
+- If it looks like a display/decorative font → return "Playfair Display"
+- Otherwise → return "Inter"
+
+Reply with ONLY the Google Font name. No explanation. No punctuation.`
         });
         let matchedFont = response.text().trim();
         matchedFont = matchedFont.replace(/['"`]/g, ''); // Remove quotes
@@ -317,16 +326,30 @@ exports.generatePDF = onCall({
     const fontCache = {};
     
     // Helper to get or download font
-    const getFont = async (fontFamily, isBold, isItalic) => {
-      const cacheKey = `${fontFamily}_${isBold ? 'B' : 'R'}_${isItalic ? 'I' : 'N'}`;
-      if (fontCache[cacheKey]) {
-        return fontCache[cacheKey];
+    const getFont = async (fontFamily) => {
+      if (fontCache[fontFamily]) {
+        return fontCache[fontFamily];
       }
       
       try {
-        const fontBytes = await downloadGoogleFontTtf(fontFamily, isBold, isItalic);
-        const embeddedFont = await pdfDoc.embedFont(fontBytes);
-        fontCache[cacheKey] = embeddedFont;
+        const cssUrl = `https://fonts.googleapis.com/css2?family=${fontFamily.replace(/\s+/g, "+")}&display=swap`;
+        const cssResponse = await axios.get(cssUrl, {
+          headers: { 
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+          }
+        });
+        const ttfMatch = cssResponse.data.match(/src: url\(([^)]+\.ttf)\)/);
+        const woffMatch = cssResponse.data.match(/src: url\(([^)]+\.woff2)\)/);
+        const fontUrl = ttfMatch ? ttfMatch[1] : (woffMatch ? woffMatch[1] : null);
+        
+        if (!fontUrl) {
+          throw new Error("No font URL found");
+        }
+        
+        console.log(`Downloading font from direct URL: ${fontUrl}`);
+        const fontResponse = await axios.get(fontUrl, { responseType: 'arraybuffer' });
+        const embeddedFont = await pdfDoc.embedFont(fontResponse.data);
+        fontCache[fontFamily] = embeddedFont;
         return embeddedFont;
       } catch (e) {
         console.error(`Could not embed Google Font ${fontFamily}:`, e);
@@ -336,52 +359,35 @@ exports.generatePDF = onCall({
     };
     
     // 5. Apply Edits Page-by-Page
-    for (const [blockId, editData] of Object.entries(edits)) {
-      const pageIndex = editData.pageNumber - 1;
+    for (const [blockId, edit] of Object.entries(edits)) {
+      const pageIndex = edit.pageNumber - 1;
       if (pageIndex < 0 || pageIndex >= pages.length) {
-        console.warn(`Edit references invalid pageNumber: ${editData.pageNumber}`);
+        console.warn(`Edit references invalid pageNumber: ${edit.pageNumber}`);
         continue;
       }
       
       const page = pages[pageIndex];
       
       // Draw a white rectangle to redact the original text
-      // Enforce Task 6: height: editData.height + 2
       page.drawRectangle({
-        x: editData.x,
-        y: editData.y,
-        width: editData.width,
-        height: editData.height + 2,
+        x: edit.x,
+        y: edit.y - 2,
+        width: edit.width + 2,
+        height: edit.height + 4,
         color: rgb(1, 1, 1),
-        filled: true
+        opacity: 1
       });
       
       // Load selected Google Font
-      const isBold = editData.fontWeight === 'bold';
-      const isItalic = editData.fontStyle === 'italic';
-      const font = await getFont(editData.fontFamily || 'Inter', isBold, isItalic);
-      
-      // Parse Color (hex to rgb)
-      let textColor = rgb(0, 0, 0); // default black
-      if (editData.color) {
-        try {
-          const hex = editData.color.replace('#', '');
-          const r = parseInt(hex.substring(0, 2), 16) / 255;
-          const g = parseInt(hex.substring(2, 4), 16) / 255;
-          const b = parseInt(hex.substring(4, 6), 16) / 255;
-          textColor = rgb(r, g, b);
-        } catch (colorError) {
-          console.warn(`Failed to parse color ${editData.color}, using black`);
-        }
-      }
+      const embeddedFont = await getFont(edit.fontFamily || 'Inter');
       
       // Draw the new text
-      page.drawText(editData.text, {
-        x: editData.x,
-        y: editData.y,
-        size: editData.fontSize,
-        font: font,
-        color: textColor
+      page.drawText(edit.text, {
+        x: edit.x,
+        y: edit.y,
+        size: edit.fontSize,
+        font: embeddedFont,
+        color: hexToRgb(edit.color || "#000000")
       });
     }
     
@@ -422,3 +428,10 @@ exports.generatePDF = onCall({
     throw new HttpsError('internal', `Failed to generate PDF: ${error.message}`);
   }
 });
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  return rgb(r, g, b);
+}

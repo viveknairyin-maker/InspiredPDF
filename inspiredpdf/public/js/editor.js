@@ -1,4 +1,6 @@
-import { getDocument, getEdits, saveEdit } from './app.js';
+import { db, storage, authPromise } from './app.js';
+import { doc, collection, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { ref, getBytes } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 // Fetch document ID from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -37,6 +39,7 @@ let pdfDoc = null;
 let currentPage = 1;
 let totalPages = 0;
 let scale = 1.0;
+let analysisTimeout = null;
 
 // Active editing state
 let activeEditingDiv = null;
@@ -117,56 +120,94 @@ function populateFontDropdown() {
   });
 }
 
-// Dynamically inject Google Font stylesheets into the page head
-function loadGoogleFont(fontFamily) {
-  if (!fontFamily) return;
-  const formattedFont = fontFamily.replace(/\s+/g, '+');
-  const linkId = `gfont-${formattedFont}`;
-  if (!document.getElementById(linkId)) {
-    const link = document.createElement('link');
-    link.id = linkId;
-    link.rel = 'stylesheet';
-    link.href = `https://fonts.googleapis.com/css2?family=${formattedFont}:ital,wght@0,400;0,700;1,400;1,700&display=swap`;
+// Dynamically inject Google Font stylesheets into the page head (Fix 1B.a)
+function loadGoogleFont(fontName) {
+  if (!fontName) return;
+  const fontId = "gfont-" + fontName.replace(/\s+/g, "-");
+  if (!document.getElementById(fontId)) {
+    const link = document.createElement("link");
+    link.id = fontId;
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/\s+/g, "+")}:wght@400;700&display=swap`;
     document.head.appendChild(link);
   }
 }
 
-// Start local document initialization
+// Start document metadata listener
 async function initEditor() {
   populateFontDropdown();
   setActiveTool('selectEdit');
   
-  try {
-    // 1. Fetch document from local IndexedDB
-    const docDataLocal = await getDocument(docId);
-    if (!docDataLocal) {
-      alert("Document not found locally. Redirecting to landing page.");
+  await authPromise;
+  
+  // Set analysis 30s timeout check
+  analysisTimeout = setTimeout(() => {
+    if (!analysis) {
+      editorLoadingScreen.classList.remove('hidden');
+      editorLoadingText.textContent = "Analysis is taking longer than expected. Please refresh.";
+      const spinner = editorLoadingScreen.querySelector('.animate-spin');
+      if (spinner) spinner.classList.add('hidden');
+    }
+  }, 30000);
+
+  // Subscribe to document metadata changes
+  const docRef = doc(db, 'documents', docId);
+  onSnapshot(docRef, async (snapshot) => {
+    if (!snapshot.exists()) {
+      alert("Document not found.");
       window.location.href = '/';
       return;
     }
     
-    docData = docDataLocal;
+    docData = snapshot.data();
     docFilenameDisplay.textContent = docData.fileName || 'Untitled.pdf';
-    analysis = docData.analysis;
     
-    // 2. Fetch existing edits from IndexedDB
-    docEdits = await getEdits(docId);
-    
-    // 3. Render PDF pages
-    await loadPDF();
-  } catch (error) {
-    console.error("Local editor initialization failed:", error);
-    alert("Failed to load editor: " + error.message);
-    window.location.href = '/';
-  }
+    if (docData.status === 'processing') {
+      editorLoadingScreen.classList.remove('hidden');
+      editorLoadingText.textContent = "Analyzing your PDF... this may take up to 30 seconds.";
+    } else if (docData.status === 'ready' && docData.analysis && !analysis) {
+      clearTimeout(analysisTimeout);
+      analysis = docData.analysis;
+      
+      // Load edits subcollection
+      subscribeToEdits();
+      
+      // Load and render PDF
+      await loadPDF();
+    } else if (docData.status === 'error') {
+      clearTimeout(analysisTimeout);
+      editorLoadingText.textContent = `Analysis failed: ${docData.error || 'Unknown error'}`;
+      const spinner = editorLoadingScreen.querySelector('.animate-spin');
+      if (spinner) spinner.classList.add('hidden');
+    }
+  });
 }
 
-// Load PDF document from local ArrayBuffer
+// Load edits subcollection in real time
+function subscribeToEdits() {
+  const editsRef = collection(db, 'documents', docId, 'edits');
+  onSnapshot(editsRef, (snapshot) => {
+    docEdits = {};
+    snapshot.forEach(docSnap => {
+      docEdits[docSnap.id] = docSnap.data();
+    });
+    
+    // Re-render the page to apply changes
+    if (pdfDoc) {
+      renderPage(currentPage);
+    }
+  });
+}
+
+// Download PDF bytes and load PDF.js
 async function loadPDF() {
   try {
     editorLoadingText.textContent = "Loading PDF viewer...";
     
-    const bytes = new Uint8Array(docData.fileBytes);
+    const fileRef = ref(storage, docData.storagePath);
+    const bytes = await getBytes(fileRef);
+    
+    // Load PDF document
     pdfDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
     totalPages = pdfDoc.numPages;
     
@@ -201,7 +242,6 @@ async function renderPage(pageNumber) {
   
   // Calculate scaling factor to fit our A4 container width
   scale = canvasContainer.clientWidth / analysisPage.width;
-  
   const scaledViewport = page.getViewport({ scale: scale });
   
   // Update page container dimensions
@@ -226,7 +266,7 @@ async function renderPage(pageNumber) {
   // Render overlay elements
   renderOverlays(pageNumber, scale, analysisPage.height);
   
-  // Update bottom page indicators
+  // Update page indicators
   pageInfo.textContent = `PAGE ${pageNumber} OF ${totalPages}`;
 }
 
@@ -267,27 +307,31 @@ function renderOverlays(pageNumber, scale, pageHeight) {
     overlay.style.height = `${height}px`;
     overlay.style.cursor = 'text';
     
-    // Font parameters
-    const fontFamily = edit ? edit.fontFamily : block.matchedGoogleFont;
-    loadGoogleFont(fontFamily);
+    // Dynamically load Google Font via link tag (Fix 1B.a)
+    const fontName = edit ? edit.fontFamily : block.matchedGoogleFont;
+    loadGoogleFont(fontName);
     
-    overlay.style.fontFamily = `"${fontFamily}", sans-serif`;
-    overlay.style.fontSize = `${(edit ? edit.fontSize : block.fontSize) * scale}px`;
-    overlay.style.fontWeight = edit ? edit.fontWeight : block.fontWeight;
-    overlay.style.fontStyle = edit ? edit.fontStyle : block.fontStyle;
-    
+    // Apply matching typography (Fix 1B.c)
     if (edit) {
-      // Redact original text
-      overlay.style.backgroundColor = '#ffffff';
+      overlay.style.fontFamily = `'${edit.fontFamily || block.matchedGoogleFont}', sans-serif`;
+      overlay.style.fontSize = `${(edit.fontSize || block.fontSize) * scale}px`;
+      overlay.style.fontWeight = edit.fontWeight || block.fontWeight;
+      overlay.style.fontStyle = edit.fontStyle || block.fontStyle;
       overlay.style.color = edit.color || '#000000';
       overlay.style.textDecoration = edit.underline ? 'underline' : 'none';
       overlay.innerText = edit.text;
     } else {
-      // Transparent overlay
-      overlay.style.backgroundColor = 'transparent';
+      overlay.style.fontFamily = `'${block.matchedGoogleFont}', sans-serif`;
+      overlay.style.fontSize = `${block.fontSize * scale}px`;
+      overlay.style.fontWeight = block.fontWeight;
+      overlay.style.fontStyle = block.fontStyle;
       overlay.style.color = 'transparent';
       overlay.innerText = block.text;
     }
+    
+    // Ensure background is transparent before editing (Fix 1A)
+    overlay.style.setProperty('background', 'transparent', 'important');
+    overlay.style.setProperty('background-color', 'transparent', 'important');
     
     overlay.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -312,10 +356,20 @@ function activateEditBlock(block, scale) {
   activeBlockId = blockId;
   activeBlockObj = block;
   
+  // Hide static overlay text
   overlayDiv.classList.add('invisible');
   
-  const edit = docEdits[blockId];
+  // Make sure background of original overlay is transparent (Fix 1A)
+  overlayDiv.style.setProperty('background', 'transparent', 'important');
+  overlayDiv.style.setProperty('background-color', 'transparent', 'important');
   
+  const edit = docEdits[blockId];
+  const fontName = edit ? edit.fontFamily : block.matchedGoogleFont;
+  
+  // Dynamically load Google Font (Fix 1B.a)
+  loadGoogleFont(fontName);
+  
+  // Create contenteditable div
   const editDiv = document.createElement('div');
   editDiv.className = 'text-block-editing';
   editDiv.contentEditable = 'true';
@@ -324,18 +378,33 @@ function activateEditBlock(block, scale) {
   editDiv.style.top = overlayDiv.style.top;
   editDiv.style.width = overlayDiv.style.width;
   editDiv.style.minHeight = overlayDiv.style.height;
-  editDiv.style.fontFamily = overlayDiv.style.fontFamily;
-  editDiv.style.fontSize = overlayDiv.style.fontSize;
-  editDiv.style.fontWeight = overlayDiv.style.fontWeight;
-  editDiv.style.fontStyle = overlayDiv.style.fontStyle;
-  editDiv.style.textDecoration = overlayDiv.style.textDecoration;
-  editDiv.style.color = edit ? (edit.color || '#000000') : '#000000';
+  
+  // Apply font and styles to contenteditable (Fix 1B.b)
+  editDiv.style.fontFamily = `'${fontName}', sans-serif`;
+  editDiv.style.fontSize = ((edit ? edit.fontSize : block.fontSize) * scale) + "px";
+  editDiv.style.fontWeight = edit ? edit.fontWeight : block.fontWeight;
+  editDiv.style.fontStyle = edit ? edit.fontStyle : block.fontStyle;
+  const colorVal = edit ? (edit.color || block.color || "inherit") : (block.color || "inherit");
+  editDiv.style.color = colorVal;
+  editDiv.style.lineHeight = "1.2";
+  editDiv.style.letterSpacing = "normal";
+  editDiv.style.webkitTextFillColor = colorVal;
+  
+  // Force transparent backgrounds & remove boundaries/decorations (Fix 1A)
+  editDiv.style.setProperty('background', 'transparent', 'important');
+  editDiv.style.setProperty('background-color', 'transparent', 'important');
+  editDiv.style.setProperty('border', 'none', 'important');
+  editDiv.style.setProperty('outline', 'none', 'important');
+  editDiv.style.setProperty('box-shadow', 'none', 'important');
+  editDiv.style.setProperty('padding', '0', 'important');
+  editDiv.style.setProperty('margin', '0', 'important');
   
   editDiv.innerText = edit ? edit.text : block.text;
   
   document.getElementById('overlays').appendChild(editDiv);
   activeEditingDiv = editDiv;
   
+  // Focus and select all content
   editDiv.focus();
   const range = document.createRange();
   range.selectNodeContents(editDiv);
@@ -401,7 +470,7 @@ function updateToolbarState() {
   underlineBtn.classList.toggle('text-on-primary', isUnderline);
 }
 
-// Close active edit and save final states
+// Close active edit, remove contenteditable and save final states
 function closeEditing() {
   if (activeEditingDiv) {
     const text = activeEditingDiv.innerText;
@@ -411,11 +480,6 @@ function closeEditing() {
     
     activeEditingDiv.remove();
     activeEditingDiv = null;
-    
-    // Visually refresh the overlays to show redacted text in the canvas
-    setTimeout(() => {
-      renderPage(currentPage);
-    }, 100);
   }
   
   if (activeOverlayDiv) {
@@ -456,29 +520,25 @@ function triggerEditSave(immediate = false) {
     }
   }
   
-  const editPayload = {
-    text: text,
-    fontSize: fontSize,
-    fontFamily: fontFamily,
-    fontWeight: fontWeight,
-    fontStyle: fontStyle,
-    color: hexColor,
-    underline: underline,
-    x: activeBlockObj.x,
-    y: activeBlockObj.y,
-    width: activeBlockObj.width,
-    height: activeBlockObj.height,
-    pageNumber: currentPage
-  };
-
-  // Cache in local memory
-  docEdits[activeBlockId] = editPayload;
-  
   const save = async () => {
     try {
-      await saveEdit(docId, activeBlockId, editPayload);
+      const editRef = doc(db, 'documents', docId, 'edits', activeBlockId);
+      await setDoc(editRef, {
+        text: text,
+        fontSize: fontSize,
+        fontFamily: fontFamily,
+        fontWeight: fontWeight,
+        fontStyle: fontStyle,
+        color: hexColor,
+        underline: underline,
+        x: activeBlockObj.x,
+        y: activeBlockObj.y,
+        width: activeBlockObj.width,
+        height: activeBlockObj.height,
+        pageNumber: currentPage
+      }, { merge: true });
     } catch (e) {
-      console.error("Failed to save edit locally:", e);
+      console.error("Failed to save edit to Firestore:", e);
     }
   };
   
