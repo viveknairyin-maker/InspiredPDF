@@ -1,0 +1,17 @@
+{
+  "cleanUrls": true,
+  "routes": [
+    {
+      "src": "/editor",
+      "dest": "/inspiredpdf/public/editor.html"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/inspiredpdf/public/js/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/inspiredpdf/public/$1"
+    }
+  ]
+}
