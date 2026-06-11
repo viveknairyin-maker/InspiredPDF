@@ -1,7 +1,24 @@
-import { getPDFFromIDB } from './app.js';
-
 const downloadBtn = document.getElementById("downloadBtn") || document.getElementById("download-pdf-btn");
 const toast = document.getElementById('toast');
+
+// Local IndexedDB getter helper
+function getPDFFromIDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open("InspiredPDF", 1);
+    req.onsuccess = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains("files")) {
+        resolve(null);
+        return;
+      }
+      const tx = db.transaction("files", "readonly");
+      const getReq = tx.objectStore("files").get("current");
+      getReq.onsuccess = () => resolve(getReq.result);
+      getReq.onerror = reject;
+    };
+    req.onerror = reject;
+  });
+}
 
 function showToast(message, isError = false) {
   if (!toast) return;

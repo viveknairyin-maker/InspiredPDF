@@ -1,4 +1,33 @@
-import { getPDFFromIDB } from './app.js';
+// Initialize global state if not present
+window.InspiredPDF = window.InspiredPDF || {
+  pdfFile: null,
+  pdfBytes: null,
+  pdfDoc: null,
+  totalPages: 0,
+  currentPage: 1,
+  analysis: null,
+  edits: {},
+  activeBlock: null
+};
+
+// Local IndexedDB getter helper
+function getPDFFromIDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open("InspiredPDF", 1);
+    req.onsuccess = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains("files")) {
+        resolve(null);
+        return;
+      }
+      const tx = db.transaction("files", "readonly");
+      const getReq = tx.objectStore("files").get("current");
+      getReq.onsuccess = () => resolve(getReq.result);
+      getReq.onerror = reject;
+    };
+    req.onerror = reject;
+  });
+}
 
 // Load PDF from sessionStorage/IndexedDB
 const pdfDataUrl = sessionStorage.getItem("inspiredpdf_data");

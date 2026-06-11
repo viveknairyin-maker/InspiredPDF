@@ -1,5 +1,3 @@
-import { storePDFInIDB } from './app.js';
-
 (function() {
   // Elements
   const uploadBtn = document.getElementById("uploadBtn");
@@ -50,14 +48,8 @@ import { storePDFInIDB } from './app.js';
   }
 
   // ---- FILE SELECTION — ONE TRIGGER ONLY ----
-  // Modal inner dropzone triggers file picker
-  if (modalDropZone) {
-    modalDropZone.addEventListener("click", function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      fileInput.click();
-    });
-  }
+  // No click event listener on modalDropZone is needed because it is a <label for="pdfFileInput">
+  // and the browser will natively click the file input exactly once.
 
   // File input change — validate and show filename
   fileInput.addEventListener("change", function(e) {
@@ -107,6 +99,24 @@ import { storePDFInIDB } from './app.js';
         " (" + (file.size / 1024 / 1024).toFixed(2) + " MB)";
       fileNameDisplay.classList.remove('hidden');
     }
+  }
+
+  // Helper to store in IndexedDB
+  function storePDFInIDB(buffer) {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open("InspiredPDF", 1);
+      req.onupgradeneeded = e => {
+        e.target.result.createObjectStore("files");
+      };
+      req.onsuccess = e => {
+        const db = e.target.result;
+        const tx = db.transaction("files", "readwrite");
+        tx.objectStore("files").put(buffer, "current");
+        tx.oncomplete = resolve;
+        tx.onerror = reject;
+      };
+      req.onerror = reject;
+    });
   }
 
   // ---- UPLOAD SUBMIT — Navigate to editor ----
