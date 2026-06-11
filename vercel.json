@@ -1,17 +1,9 @@
 {
   "cleanUrls": true,
-  "routes": [
-    {
-      "src": "/editor",
-      "dest": "/inspiredpdf/public/editor.html"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/inspiredpdf/public/js/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/inspiredpdf/public/$1"
-    }
+  "rewrites": [
+    { "source": "/editor", "destination": "/inspiredpdf/public/editor.html" },
+    { "source": "/js/:path*", "destination": "/inspiredpdf/public/js/:path*" },
+    { "source": "/", "destination": "/inspiredpdf/public/index.html" },
+    { "source": "/:path*", "destination": "/inspiredpdf/public/:path*" }
   ]
 }
