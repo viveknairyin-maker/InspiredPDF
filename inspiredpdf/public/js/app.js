@@ -6,12 +6,13 @@ import { getFunctions } from "https://www.gstatic.com/firebasejs/10.12.0/firebas
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDUUb-wEXLy1YYe8iauxeehHSn-Jg-k9KY",
+  authDomain: "inspiredpdf.firebaseapp.com",
+  projectId: "inspiredpdf",
+  storageBucket: "inspiredpdf.firebasestorage.app",
+  messagingSenderId: "433590225047",
+  appId: "1:433590225047:web:292fb6d27df589040601d2",
+  measurementId: "G-3KLS4M3YSZ"
 };
 
 // Initialize Firebase
