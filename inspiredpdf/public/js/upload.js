@@ -124,6 +124,8 @@ async function handleFile(file) {
     reader.onload = async (e) => {
       try {
         const arrayBuffer = e.target.result;
+        // Keep a copy of the ArrayBuffer before it gets detached by the PDF.js Web Worker
+        const arrayBufferCopy = arrayBuffer.slice(0);
         
         // Parse PDF pages using PDF.js locally in the browser
         const pdfDoc = await pdfjsLib.getDocument({
@@ -196,7 +198,7 @@ async function handleFile(file) {
         const analysis = { pages: pagesData };
         
         // Save PDF file bytes and analysis locally in IndexedDB
-        await saveDocument(docId, selectedFile.name, selectedFile.size, arrayBuffer, analysis);
+        await saveDocument(docId, selectedFile.name, selectedFile.size, arrayBufferCopy, analysis);
         
         console.log(`Document saved locally with ID: ${docId}`);
         
