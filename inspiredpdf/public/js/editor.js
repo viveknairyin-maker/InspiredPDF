@@ -453,6 +453,10 @@ function renderOverlays(pageNumber, scale, pageHeight) {
       overlay.style.color = edit.color || '#000000';
       overlay.style.textDecoration = edit.underline ? 'underline' : 'none';
       overlay.innerText = edit.text;
+      
+      // Cover original PDF text with white background
+      overlay.style.setProperty('background', 'white', 'important');
+      overlay.style.setProperty('background-color', 'white', 'important');
     } else {
       overlay.style.fontFamily = `'${block.matchedGoogleFont}', sans-serif`;
       overlay.style.fontSize = `${block.fontSize * scale}px`;
@@ -460,11 +464,10 @@ function renderOverlays(pageNumber, scale, pageHeight) {
       overlay.style.fontStyle = block.fontStyle;
       overlay.style.color = 'transparent';
       overlay.innerText = block.text;
+      
+      overlay.style.setProperty('background', 'transparent', 'important');
+      overlay.style.setProperty('background-color', 'transparent', 'important');
     }
-    
-    // Ensure background is transparent before editing (Fix 1A)
-    overlay.style.setProperty('background', 'transparent', 'important');
-    overlay.style.setProperty('background-color', 'transparent', 'important');
     
     overlay.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -519,9 +522,9 @@ function activateEditBlock(block, scale) {
   editDiv.style.letterSpacing = "normal";
   editDiv.style.webkitTextFillColor = colorVal;
   
-  // Force transparent backgrounds & remove boundaries/decorations (Fix 1A)
-  editDiv.style.setProperty('background', 'transparent', 'important');
-  editDiv.style.setProperty('background-color', 'transparent', 'important');
+  // Force white background to cover original text on canvas, but remove all boundaries/decorations (Fix 1A)
+  editDiv.style.setProperty('background', 'white', 'important');
+  editDiv.style.setProperty('background-color', 'white', 'important');
   editDiv.style.setProperty('border', 'none', 'important');
   editDiv.style.setProperty('outline', 'none', 'important');
   editDiv.style.setProperty('box-shadow', 'none', 'important');
