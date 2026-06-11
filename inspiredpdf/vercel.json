@@ -3,15 +3,15 @@
   "routes": [
     {
       "src": "/editor",
-      "dest": "/inspiredpdf/public/editor.html"
+      "dest": "/public/editor.html"
     },
     {
       "src": "/js/(.*)",
-      "dest": "/inspiredpdf/public/js/$1"
+      "dest": "/public/js/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/inspiredpdf/public/$1"
+      "dest": "/public/$1"
     }
   ]
 }
