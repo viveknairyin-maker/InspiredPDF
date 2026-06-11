@@ -399,6 +399,20 @@ async function renderPage(pageNumber) {
   };
   await page.render(renderContext).promise;
   
+  // Cover original PDF text on the canvas for all edited blocks
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff'; // White page background
+  analysisPage.textBlocks.forEach(block => {
+    const edit = window.InspiredPDF.edits[block.id];
+    if (edit) {
+      const left = block.x * scale;
+      const top = (analysisPage.height - block.y - block.height) * scale;
+      const width = block.width * scale;
+      const height = block.height * scale;
+      ctx.fillRect(left - 1, top - 2, width + 2, height + 4);
+    }
+  });
+  
   renderOverlays(pageNumber, scale, analysisPage.height);
   
   if (pageInfo) {
@@ -453,10 +467,6 @@ function renderOverlays(pageNumber, scale, pageHeight) {
       overlay.style.color = edit.color || '#000000';
       overlay.style.textDecoration = edit.underline ? 'underline' : 'none';
       overlay.innerText = edit.text;
-      
-      // Cover original PDF text with white background
-      overlay.style.setProperty('background', 'white', 'important');
-      overlay.style.setProperty('background-color', 'white', 'important');
     } else {
       overlay.style.fontFamily = `'${block.matchedGoogleFont}', sans-serif`;
       overlay.style.fontSize = `${block.fontSize * scale}px`;
@@ -464,10 +474,11 @@ function renderOverlays(pageNumber, scale, pageHeight) {
       overlay.style.fontStyle = block.fontStyle;
       overlay.style.color = 'transparent';
       overlay.innerText = block.text;
-      
-      overlay.style.setProperty('background', 'transparent', 'important');
-      overlay.style.setProperty('background-color', 'transparent', 'important');
     }
+    
+    // overlays are completely transparent because the underlying canvas text is covered natively
+    overlay.style.setProperty('background', 'transparent', 'important');
+    overlay.style.setProperty('background-color', 'transparent', 'important');
     
     overlay.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -497,6 +508,19 @@ function activateEditBlock(block, scale) {
   overlayDiv.style.setProperty('background', 'transparent', 'important');
   overlayDiv.style.setProperty('background-color', 'transparent', 'important');
   
+  // Erase original text from the canvas context underneath this active block immediately to prevent overlaps while typing
+  const canvas = canvasContainer.querySelector('canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    const analysisPage = window.InspiredPDF.analysis.pages[currentPage - 1];
+    const left = block.x * scale;
+    const top = (analysisPage.height - block.y - block.height) * scale;
+    const width = block.width * scale;
+    const height = block.height * scale;
+    ctx.fillRect(left - 1, top - 2, width + 2, height + 4);
+  }
+
   const edit = window.InspiredPDF.edits[blockId];
   const fontName = edit ? edit.fontFamily : block.matchedGoogleFont;
   
@@ -522,9 +546,9 @@ function activateEditBlock(block, scale) {
   editDiv.style.letterSpacing = "normal";
   editDiv.style.webkitTextFillColor = colorVal;
   
-  // Force white background to cover original text on canvas, but remove all boundaries/decorations (Fix 1A)
-  editDiv.style.setProperty('background', 'white', 'important');
-  editDiv.style.setProperty('background-color', 'white', 'important');
+  // Force transparent backgrounds & remove boundaries/decorations (Fix 1A)
+  editDiv.style.setProperty('background', 'transparent', 'important');
+  editDiv.style.setProperty('background-color', 'transparent', 'important');
   editDiv.style.setProperty('border', 'none', 'important');
   editDiv.style.setProperty('outline', 'none', 'important');
   editDiv.style.setProperty('box-shadow', 'none', 'important');
