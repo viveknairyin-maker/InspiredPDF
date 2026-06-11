@@ -203,7 +203,7 @@ async function handleFile(file) {
         console.log(`Document saved locally with ID: ${docId}`);
         
         // Redirect to local editor page
-        window.location.href = `/editor?docId=${docId}`;
+        window.location.href = `/editor.html?docId=${docId}`;
       } catch (err) {
         console.error("Local parsing failed:", err);
         showError(`Failed to parse PDF: ${err.message}`);
