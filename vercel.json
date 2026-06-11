@@ -1,5 +1,8 @@
 {
+  "cleanUrls": true,
   "rewrites": [
-    { "source": "/editor", "destination": "/editor.html" }
+    { "source": "/editor", "destination": "/inspiredpdf/public/editor.html" },
+    { "source": "/js/:path*", "destination": "/inspiredpdf/public/js/:path*" },
+    { "source": "/:path*", "destination": "/inspiredpdf/public/:path*" }
   ]
 }
