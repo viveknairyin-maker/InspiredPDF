@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFunctions } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
 
 // Your web app's Firebase configuration
@@ -19,35 +18,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
-const auth = getAuth(app);
 const functions = getFunctions(app);
+const auth = null; // Removed Firebase Authentication
 
-// Silently sign in anonymously
-async function initAuth() {
-  return new Promise((resolve, reject) => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      unsubscribe();
-      if (user) {
-        localStorage.setItem('inspiredpdf_userId', user.uid);
-        console.log("User is signed in anonymously:", user.uid);
-        resolve(user);
-      } else {
-        signInAnonymously(auth)
-          .then((cred) => {
-            localStorage.setItem('inspiredpdf_userId', cred.user.uid);
-            console.log("Newly signed in anonymously:", cred.user.uid);
-            resolve(cred.user);
-          })
-          .catch((err) => {
-            console.error("Anonymous authentication failed:", err);
-            reject(err);
-          });
-      }
-    });
-  });
+// Generate or retrieve a persistent local session ID to act as a user ID
+function getOrCreateLocalSessionId() {
+  let sessionId = localStorage.getItem('inspiredpdf_userId');
+  if (!sessionId) {
+    sessionId = 'sess_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('inspiredpdf_userId', sessionId);
+  }
+  return sessionId;
 }
 
-// Start auth process immediately
-const authPromise = initAuth();
+const localSessionId = getOrCreateLocalSessionId();
+console.log("Local session ID:", localSessionId);
+
+// Resolve authPromise immediately with simulated user details
+const authPromise = Promise.resolve({ uid: localSessionId });
 
 export { app, db, storage, auth, functions, authPromise };
