@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>InspiredPDF Editor | Professional Workspace</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#e2e2e2",
+                        "on-background": "#1b1b1b",
+                        "on-primary-fixed": "#1b1b1b",
+                        "outline-variant": "#cfc4c5",
+                        "on-primary-fixed-variant": "#474747",
+                        "surface-container-high": "#e8e8e8",
+                        "primary": "#000000",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#dfe0e0",
+                        "error": "#ba1a1a",
+                        "primary-container": "#1b1b1b",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "secondary-fixed": "#e2e2e2",
+                        "inverse-on-surface": "#f1f1f1",
+                        "tertiary": "#000000",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "inverse-surface": "#303030",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-variant": "#e2e2e2",
+                        "surface-tint": "#5e5e5e",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#1b1b1b",
+                        "surface-bright": "#f9f9f9",
+                        "on-secondary-fixed-variant": "#454747",
+                        "on-tertiary-fixed": "#1b1b1b",
+                        "on-secondary-container": "#616363",
+                        "surface": "#f9f9f9",
+                        "on-surface-variant": "#4c4546",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-primary-container": "#848484",
+                        "outline": "#7e7576",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-surface": "#1b1b1b",
+                        "background": "#f9f9f9",
+                        "secondary": "#5d5f5f",
+                        "inverse-primary": "#c6c6c6",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "primary-fixed-dim": "#c6c6c6",
+                        "surface-dim": "#dadada",
+                        "on-tertiary-container": "#848484",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "1px",
+                        "margin-desktop": "32px",
+                        "xl": "40px",
+                        "md": "16px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; color: #1b1b1b; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .pixel-border { border: 1px solid #000000; }
+        .thick-border { border: 2px solid #000000; }
+        .bottom-shadow { box-shadow: 4px 4px 0px 0px #000000; }
+        .small-caps { font-variant: small-caps; }
+        .pdf-overlay {
+            position: absolute;
+            cursor: text;
+            box-sizing: border-box;
+            border: 1px dashed transparent;
+            transition: border-color 0.1s ease;
+        }
+        .pdf-overlay:hover {
+            border-color: #000000;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .pdf-overlay.active {
+            border: 1px solid #000000;
+        }
+        .text-block-editing {
+            position: absolute;
+            outline: 1px solid #000000;
+            background: white;
+            z-index: 30;
+            overflow: visible;
+            white-space: pre-wrap;
+            box-sizing: border-box;
+        }
+        /* Color Picker popover styling */
+        .color-picker-popover {
+            box-shadow: 3px 3px 0px 0px #000000;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+    <!-- SUCCESS/FAILURE TOAST -->
+    <div id="toast" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-primary text-on-primary px-xl py-md rounded shadow-lg transition-all duration-300 font-label-bold text-label-bold border border-on-primary">
+        Your PDF is ready!
+    </div>
+
+    <!-- TopNavBar -->
+    <header class="bg-primary text-on-primary flex justify-between items-center px-lg py-sm w-full h-16 docked full-width top-0 z-50">
+        <div class="flex items-center">
+            <span class="text-headline-md font-headline-md text-on-primary cursor-pointer" onclick="window.location.href='/'">InspiredPDF</span>
+        </div>
+        <div class="flex items-center space-x-md">
+            <span class="material-symbols-outlined text-sm opacity-60">description</span>
+            <span id="doc-filename-display" class="font-body-md text-body-md tracking-wide">Loading document...</span>
+        </div>
+        <div class="flex items-center space-x-md">
+            <button id="download-pdf-btn" class="bg-primary border border-on-primary text-on-primary font-label-bold text-label-bold px-lg py-sm rounded transition-all hover:bg-on-primary hover:text-primary active:opacity-80">
+                Download PDF
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- SideNavBar -->
+        <aside class="bg-surface w-64 h-full border-r border-primary flex flex-col py-lg px-0 shrink-0">
+            <div class="px-md mb-lg">
+                <h2 class="font-label-bold text-label-bold small-caps tracking-widest text-primary">EDIT TOOLS</h2>
+            </div>
+            <nav class="flex flex-col space-y-gutter">
+                <!-- Select & Edit Text (ACTIVE) -->
+                <button id="tool-select-edit" class="flex items-center space-x-md px-md py-md bg-primary text-on-primary transition-all duration-150">
+                    <span class="material-symbols-outlined" data-icon="edit">edit</span>
+                    <span class="font-label-bold text-label-bold">Select &amp; Edit Text</span>
+                </button>
+                <!-- Inactive items -->
+                <button id="tool-change-font" class="flex items-center space-x-md px-md py-md text-primary hover:bg-secondary-container transition-all duration-150">
+                    <span class="material-symbols-outlined" data-icon="format_size">format_size</span>
+                    <span class="font-label-bold text-label-bold">Change Font</span>
+                </button>
+                <button id="tool-change-size" class="flex items-center space-x-md px-md py-md text-primary hover:bg-secondary-container transition-all duration-150">
+                    <span class="material-symbols-outlined" data-icon="text_fields">text_fields</span>
+                    <span class="font-label-bold text-label-bold">Change Font Size</span>
+                </button>
+                <button id="tool-change-color" class="flex items-center space-x-md px-md py-md text-primary hover:bg-secondary-container transition-all duration-150">
+                    <span class="material-symbols-outlined" data-icon="circle">circle</span>
+                    <span class="font-label-bold text-label-bold">Change Text Color</span>
+                </button>
+                <button id="tool-bold-italic" class="flex items-center space-x-md px-md py-md text-primary hover:bg-secondary-container transition-all duration-150">
+                    <span class="material-symbols-outlined" data-icon="format_bold">format_bold</span>
+                    <span class="font-label-bold text-label-bold">Bold / Italic</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main id="workspace-main" class="flex-1 relative bg-surface-container overflow-auto flex flex-col items-center py-xl">
+            <!-- Floating Editor Toolbar -->
+            <div id="floating-toolbar" class="absolute z-20 bg-white thick-border p-base flex items-center space-x-base rounded-lg bottom-shadow" style="display: none; transform: translateY(-20px);">
+                <!-- Font family selection -->
+                <div class="flex items-center px-sm border-r border-primary">
+                    <select id="font-family-select" class="font-label-bold text-label-bold bg-transparent border-none focus:outline-none cursor-pointer pr-4 text-xs">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <!-- Font size input -->
+                <div class="flex items-center px-sm border-r border-primary">
+                    <input id="font-size-input" class="w-12 text-center font-label-bold text-label-bold focus:outline-none text-xs" type="number" min="6" max="72" value="12"/>
+                    <span class="text-[10px] font-label-bold text-secondary">PT</span>
+                </div>
+                <!-- Styles (B, I, U) -->
+                <div class="flex items-center space-x-xs px-sm border-r border-primary">
+                    <button id="bold-btn" class="hover:bg-primary hover:text-on-primary p-xs rounded transition-colors flex items-center justify-center"><span class="material-symbols-outlined text-md">format_bold</span></button>
+                    <button id="italic-btn" class="hover:bg-primary hover:text-on-primary p-xs rounded transition-colors flex items-center justify-center"><span class="material-symbols-outlined text-md">format_italic</span></button>
+                    <button id="underline-btn" class="hover:bg-primary hover:text-on-primary p-xs rounded transition-colors underline flex items-center justify-center"><span class="material-symbols-outlined text-md">format_underlined</span></button>
+                </div>
+                <!-- Color Swatch & Custom Hex Picker -->
+                <div class="px-sm flex items-center relative">
+                    <button id="color-swatch-btn" class="w-5 h-5 bg-primary rounded-full border border-primary cursor-pointer focus:outline-none"></button>
+                    <!-- Custom monochrome color picker dropdown -->
+                    <div id="color-picker-popover" class="hidden absolute top-8 right-0 bg-white border border-primary p-md rounded z-30 flex flex-col gap-sm color-picker-popover w-28">
+                        <div class="flex justify-between">
+                            <button class="w-5 h-5 rounded-full bg-black border border-primary" data-color="#000000" title="Black"></button>
+                            <button class="w-5 h-5 rounded-full bg-white border border-primary" data-color="#ffffff" title="White"></button>
+                            <button class="w-5 h-5 rounded-full bg-gray-500 border border-primary" data-color="#808080" title="Gray"></button>
+                        </div>
+                        <div class="flex items-center border border-primary px-xs py-2xs">
+                            <span class="text-[10px] font-label-bold text-secondary mr-2xs">#</span>
+                            <input type="text" id="color-hex-input" class="w-full border-none focus:outline-none p-0 text-[10px] font-label-bold uppercase" placeholder="000000" maxlength="6"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Page Rendering Area -->
+            <!-- The outer frame has the class from Stitch. Padding is set dynamically or kept -->
+            <div id="canvas-container" class="relative bg-white pixel-border w-[595px] h-[842px] mb-12 flex flex-col p-0 shadow-sm select-none">
+                <!-- PDF Canvas & Overlays will be appended here dynamically -->
+            </div>
+
+            <!-- Page Navigation Bottom Bar -->
+            <footer class="fixed bottom-0 left-64 right-0 h-12 bg-white border-t border-primary flex items-center justify-center z-40">
+                <div class="flex items-center space-x-lg">
+                    <button id="prev-page-btn" class="hover:bg-primary-container p-xs transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary">chevron_left</span>
+                    </button>
+                    <span id="page-info" class="font-label-bold text-label-bold text-primary tracking-widest">PAGE 1 OF ...</span>
+                    <button id="next-page-btn" class="hover:bg-primary-container p-xs transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary">chevron_right</span>
+                    </button>
+                </div>
+            </footer>
+
+            <!-- Loading overlay inside the main panel -->
+            <div id="editor-loading-screen" class="absolute inset-0 bg-surface-container flex flex-col items-center justify-center z-30">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-solid border-primary border-t-transparent mb-md"></div>
+                <p id="editor-loading-text" class="font-headline-md text-primary font-bold text-center">Analyzing your PDF... This may take a few seconds.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <!-- Firebase Config & Scripts -->
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+          "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+          "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+          "firebase/storage": "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js",
+          "firebase/functions": "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js"
+        }
+      }
+    </script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/editor.js"></script>
+    <script type="module" src="js/download.js"></script>
+</body>
+</html>

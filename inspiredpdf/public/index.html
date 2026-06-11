@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>InspiredPDF | Edit Any PDF. Keep the Font. Keep the Spacing.</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#e2e2e2",
+                    "on-background": "#1b1b1b",
+                    "on-primary-fixed": "#1b1b1b",
+                    "outline-variant": "#cfc4c5",
+                    "on-primary-fixed-variant": "#474747",
+                    "surface-container-high": "#e8e8e8",
+                    "primary": "#000000",
+                    "on-error-container": "#93000a",
+                    "secondary-container": "#dfe0e0",
+                    "error": "#ba1a1a",
+                    "primary-container": "#1b1b1b",
+                    "secondary-fixed-dim": "#c6c6c7",
+                    "secondary-fixed": "#e2e2e2",
+                    "inverse-on-surface": "#f1f1f1",
+                    "tertiary": "#000000",
+                    "on-secondary": "#ffffff",
+                    "surface-container": "#eeeeee",
+                    "inverse-surface": "#303030",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f3f3f3",
+                    "surface-variant": "#e2e2e2",
+                    "surface-tint": "#5e5e5e",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#1b1b1b",
+                    "surface-bright": "#f9f9f9",
+                    "on-secondary-fixed-variant": "#454747",
+                    "on-tertiary-fixed": "#1b1b1b",
+                    "on-secondary-container": "#616363",
+                    "surface": "#f9f9f9",
+                    "on-surface-variant": "#4c4546",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-primary-container": "#848484",
+                    "outline": "#7e7576",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-surface": "#1b1b1b",
+                    "background": "#f9f9f9",
+                    "secondary": "#5d5f5f",
+                    "inverse-primary": "#c6c6c6",
+                    "tertiary-fixed-dim": "#c6c6c6",
+                    "primary-fixed-dim": "#c6c6c6",
+                    "surface-dim": "#dadada",
+                    "on-tertiary-container": "#848484",
+                    "on-tertiary-fixed-variant": "#474747",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "1px",
+                    "margin-desktop": "32px",
+                    "xl": "40px",
+                    "md": "16px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "margin-mobile": "16px",
+                    "xs": "4px",
+                    "sm": "8px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-xl": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+            color: #1b1b1b;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+        .border-grid {
+            border: 1px solid #000;
+        }
+        .upload-dashed {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='black' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+        .btn-primary:hover {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #000000;
+        }
+        .btn-secondary:hover {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        /* Modal Overlay stippled effect */
+        .overlay-stipple {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(2px);
+        }
+        .modal-shadow-block {
+            box-shadow: 4px 4px 0px 0px #000000;
+        }
+        .drag-zone {
+            border: 2px dashed #000000;
+            transition: background-color 0.1s ease;
+        }
+        .drag-zone.active {
+            background-color: #eeeeee;
+        }
+        .primary-btn {
+            background-color: #000000;
+            color: #ffffff;
+            border-radius: 4px;
+            transition: all 0.15s ease-in-out;
+        }
+        .primary-btn:hover {
+            background-color: #ffffff;
+            color: #000000;
+            outline: 1px solid #000000;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- TopNavBar -->
+    <nav class="bg-surface border-b border-primary fixed top-0 left-0 w-full z-50">
+        <div class="flex justify-between items-center px-margin-desktop py-md w-full max-w-[1440px] mx-auto">
+            <!-- Brand Logo -->
+            <div class="text-headline-md font-headline-md text-primary">
+                InspiredPDF
+            </div>
+            <!-- Navigation Links -->
+            <div class="hidden md:flex items-center gap-xl">
+                <a class="font-body-md text-body-md text-secondary hover:text-primary transition-colors duration-200" href="#">Features</a>
+                <a class="font-body-md text-body-md text-secondary hover:text-primary transition-colors duration-200" href="#">Pricing</a>
+                <a class="font-body-md text-body-md text-secondary hover:text-primary transition-colors duration-200" href="#">Login</a>
+            </div>
+            <!-- Trailing Action -->
+            <button id="nav-try-btn" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-bold text-label-bold btn-primary transition-all duration-150">
+                Try for Free
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-32">
+        <!-- Hero Section -->
+        <section class="max-w-[1440px] mx-auto px-margin-desktop text-center pb-24">
+            <div class="max-w-4xl mx-auto">
+                <h1 class="font-headline-xl text-headline-xl mb-md">
+                    Edit Any PDF. Keep the Font. Keep the Spacing.
+                </h1>
+                <p class="font-body-lg text-body-lg text-secondary mb-xl">
+                    Upload your PDF, edit text with matching fonts, and download instantly. No design skills needed.
+                </p>
+            </div>
+            <!-- Central Action Area -->
+            <div class="max-w-2xl mx-auto flex flex-col items-center">
+                <button id="upload-start-btn" class="bg-primary text-on-primary px-xl py-lg rounded-lg font-headline-md text-headline-md btn-primary transition-all duration-150 mb-md active:scale-95">
+                    Upload PDF to Start
+                </button>
+                <!-- Upload Zone -->
+                <div class="w-full h-48 upload-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer hover:bg-surface-container-low group" id="drop-zone">
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-primary text-5xl mb-sm block group-hover:scale-110 transition-transform">upload_file</span>
+                        <p class="font-label-bold text-label-bold uppercase text-secondary">or drag &amp; drop your PDF here</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Visual Divider -->
+        <div class="w-full border-t border-primary"></div>
+        <!-- Features Section -->
+        <section class="bg-surface-container-lowest py-24">
+            <div class="max-w-[1440px] mx-auto px-margin-desktop">
+                <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x border-grid rounded-lg bg-white overflow-hidden">
+                    <!-- Column 1 -->
+                    <div class="p-lg flex flex-col items-center text-center">
+                        <div class="mb-md">
+                            <span class="material-symbols-outlined text-[48px] text-primary" data-icon="font_download">font_download</span>
+                        </div>
+                        <h3 class="font-headline-md text-headline-md mb-sm">Font Matching</h3>
+                        <p class="font-body-md text-body-md text-secondary">Our AI automatically detects the fonts in your PDF and matches them perfectly so your edits look authentic.</p>
+                    </div>
+                    <!-- Column 2 -->
+                    <div class="p-lg flex flex-col items-center text-center">
+                        <div class="mb-md">
+                            <span class="material-symbols-outlined text-[48px] text-primary" data-icon="edit">edit</span>
+                        </div>
+                        <h3 class="font-headline-md text-headline-md mb-sm">In-place Text Editing</h3>
+                        <p class="font-body-md text-body-md text-secondary">Click any text block to start typing. Change dates, names, or prices directly within the original layout.</p>
+                    </div>
+                    <!-- Column 3 -->
+                    <div class="p-lg flex flex-col items-center text-center">
+                        <div class="mb-md">
+                            <span class="material-symbols-outlined text-[48px] text-primary" data-icon="download">download</span>
+                        </div>
+                        <h3 class="font-headline-md text-headline-md mb-sm">Instant Download</h3>
+                        <p class="font-body-md text-body-md text-secondary">Save your changes and get a high-quality PDF back in seconds. No watermarks, no complex exports.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Bento Grid Interaction Demo (Asymmetric Layout) -->
+        <section class="py-24 border-t border-primary bg-white">
+            <div class="max-w-[1440px] mx-auto px-margin-desktop grid grid-cols-12 gap-gutter bg-primary border-grid rounded-lg overflow-hidden">
+                <div class="col-span-12 md:col-span-8 bg-white p-xl">
+                    <h2 class="font-headline-lg text-headline-lg mb-lg">Precision Editing Panel</h2>
+                    <div class="border-grid rounded-lg h-64 relative overflow-hidden bg-surface-container">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="bg-white border-grid p-lg w-3/4 animate-pulse">
+                                <div class="h-4 bg-primary w-full mb-base"></div>
+                                <div class="h-4 bg-primary w-2/3 mb-base"></div>
+                                <div class="h-4 bg-primary w-4/5"></div>
+                            </div>
+                        </div>
+                        <!-- Floating Editor UI Mockup -->
+                        <div class="absolute top-md right-md bg-white border-grid p-sm flex items-center gap-sm">
+                            <div class="border-grid rounded-lg px-base py-xs text-[10px] font-bold">INTER</div>
+                            <div class="border-grid rounded-lg px-base py-xs text-[10px] font-bold">12PT</div>
+                            <span class="material-symbols-outlined text-sm">format_bold</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-12 md:col-span-4 bg-primary text-white p-xl flex flex-col justify-center">
+                    <h3 class="font-headline-md text-headline-md mb-md">Why Pros Choose Us</h3>
+                    <ul class="space-y-md font-body-md">
+                        <li class="flex items-center gap-sm">
+                            <span class="material-symbols-outlined text-lg">check_circle</span>
+                            Preserves Layout Integrity
+                        </li>
+                        <li class="flex items-center gap-sm">
+                            <span class="material-symbols-outlined text-lg">check_circle</span>
+                            No Formatting Shifts
+                        </li>
+                        <li class="flex items-center gap-sm">
+                            <span class="material-symbols-outlined text-lg">check_circle</span>
+                            Encrypted File Transfers
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface border-t border-primary">
+        <div class="flex flex-col items-center justify-center py-xl w-full max-w-[1440px] mx-auto">
+            <div class="mb-md">
+                <p class="font-body-sm text-body-sm text-secondary">© 2025 InspiredPDF. All rights reserved.</p>
+            </div>
+            <div class="flex gap-lg">
+                <a class="font-body-sm text-body-sm text-secondary hover:underline" href="#">Privacy Policy</a>
+                <a class="font-body-sm text-body-sm text-secondary hover:underline" href="#">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL OVERLAY -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center overlay-stipple p-margin-mobile" id="modalOverlay" style="display: none;">
+        <!-- MODAL CONTAINER -->
+        <div class="relative w-full max-w-lg bg-white border-2 border-primary modal-shadow-block animate-in fade-in zoom-in duration-200">
+            <!-- HEADER -->
+            <header class="flex items-center justify-between px-lg py-md border-b border-primary">
+                <h2 class="font-headline-md text-headline-md text-primary">Upload Your PDF</h2>
+                <button class="p-xs hover:bg-surface-container-highest transition-colors" id="closeBtn">
+                    <span class="material-symbols-outlined text-primary">close</span>
+                </button>
+            </header>
+            
+            <!-- CONTENT -->
+            <div class="p-lg relative">
+                <!-- Upload Area -->
+                <label class="drag-zone group flex flex-col items-center justify-center w-full h-64 cursor-pointer bg-surface hover:bg-surface-container-low" for="fileUpload" id="modal-drag-zone">
+                    <input accept=".pdf" class="hidden" id="fileUpload" type="file"/>
+                    <div class="flex flex-col items-center justify-center space-y-md">
+                        <div class="w-16 h-16 border border-primary flex items-center justify-center bg-white group-hover:bg-primary group-hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-[32px]">upload_file</span>
+                        </div>
+                        <div class="text-center">
+                            <p class="font-label-bold text-label-bold text-primary">Click to browse or drag &amp; drop</p>
+                            <p class="font-body-sm text-secondary mt-xs hidden" id="fileName"></p>
+                        </div>
+                    </div>
+                </label>
+                <!-- Help & Error Text -->
+                <div class="mt-md flex flex-col gap-xs justify-between">
+                    <div class="flex items-center gap-xs text-secondary">
+                        <span class="material-symbols-outlined text-[16px]">info</span>
+                        <span class="font-body-sm text-body-sm">Supported: .pdf files only. Max size: 25MB</span>
+                    </div>
+                    <p id="upload-error" class="text-error text-body-sm font-bold mt-xs hidden"></p>
+                </div>
+                
+                <!-- LOADING SPINNER CONTAINER -->
+                <div id="modalLoading" class="hidden absolute inset-0 bg-white flex flex-col items-center justify-center z-10 p-lg">
+                    <div class="animate-spin rounded-full h-12 w-12 border-4 border-solid border-primary border-t-transparent mb-md"></div>
+                    <p class="font-headline-md text-primary text-center font-bold" id="modalLoadingText">Analyzing your PDF...</p>
+                </div>
+            </div>
+            
+            <!-- FOOTER / PRIMARY ACTION -->
+            <footer class="p-lg pt-0" id="modalFooter">
+                <button class="primary-btn w-full py-md font-label-bold text-label-bold flex items-center justify-center gap-sm active:scale-95" id="uploadBtn">
+                    Upload &amp; Start Editing
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+            </footer>
+            
+            <!-- DECORATIVE CORNER ELEMENTS -->
+            <div class="absolute -top-1 -left-1 w-2 h-2 bg-primary"></div>
+            <div class="absolute -top-1 -right-1 w-2 h-2 bg-primary"></div>
+            <div class="absolute -bottom-1 -left-1 w-2 h-2 bg-primary"></div>
+            <div class="absolute -bottom-1 -right-1 w-2 h-2 bg-primary"></div>
+        </div>
+    </div>
+
+    <!-- Firebase configuration & scripts -->
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+          "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+          "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+          "firebase/storage": "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js"
+        }
+      }
+    </script>
+    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/upload.js"></script>
+</body>
+</html>

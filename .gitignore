@@ -1,0 +1,7 @@
+node_modules/
+.firebase/
+inspiredpdf/functions/node_modules/
+inspiredpdf/public/node_modules/
+.env
+*.local
+.firebaserc

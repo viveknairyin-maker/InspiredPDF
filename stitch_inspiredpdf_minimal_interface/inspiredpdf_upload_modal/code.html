@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>InspiredPDF - Upload</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#e2e2e2",
+                        "on-background": "#1b1b1b",
+                        "on-primary-fixed": "#1b1b1b",
+                        "outline-variant": "#cfc4c5",
+                        "on-primary-fixed-variant": "#474747",
+                        "surface-container-high": "#e8e8e8",
+                        "primary": "#000000",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#dfe0e0",
+                        "error": "#ba1a1a",
+                        "primary-container": "#1b1b1b",
+                        "secondary-fixed-dim": "#c6c6c7",
+                        "secondary-fixed": "#e2e2e2",
+                        "inverse-on-surface": "#f1f1f1",
+                        "tertiary": "#000000",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "inverse-surface": "#303030",
+                        "on-secondary-fixed": "#1a1c1c",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-variant": "#e2e2e2",
+                        "surface-tint": "#5e5e5e",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#1b1b1b",
+                        "surface-bright": "#f9f9f9",
+                        "on-secondary-fixed-variant": "#454747",
+                        "on-tertiary-fixed": "#1b1b1b",
+                        "on-secondary-container": "#616363",
+                        "surface": "#f9f9f9",
+                        "on-surface-variant": "#4c4546",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-primary-container": "#848484",
+                        "outline": "#7e7576",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-surface": "#1b1b1b",
+                        "background": "#f9f9f9",
+                        "secondary": "#5d5f5f",
+                        "inverse-primary": "#c6c6c6",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "primary-fixed-dim": "#c6c6c6",
+                        "surface-dim": "#dadada",
+                        "on-tertiary-container": "#848484",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "1px",
+                        "margin-desktop": "32px",
+                        "xl": "40px",
+                        "md": "16px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Hard-edge minimalism: focus states and buttons */
+        .primary-btn {
+            background-color: #000000;
+            color: #ffffff;
+            border-radius: 4px;
+            transition: all 0.15s ease-in-out;
+        }
+        .primary-btn:hover {
+            background-color: #ffffff;
+            color: #000000;
+            outline: 1px solid #000000;
+        }
+        
+        .drag-zone {
+            border: 2px dashed #000000;
+            transition: background-color 0.1s ease;
+        }
+        .drag-zone.active {
+            background-color: #eeeeee;
+        }
+
+        /* Modal Overlay stippled effect suggestion from design system */
+        .overlay-stipple {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-shadow-block {
+            box-shadow: 4px 4px 0px 0px #000000;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface overflow-hidden">
+<!-- Dashboard/Editor Placeholder Background -->
+<div class="fixed inset-0 flex flex-col pointer-events-none opacity-20">
+<!-- Predicted TopNavBar Implementation -->
+<header class="flex justify-between items-center px-margin-desktop py-md w-full border-b border-primary bg-surface h-16">
+<div class="text-headline-md font-headline-md text-primary">InspiredPDF</div>
+<div class="flex gap-lg">
+<span class="text-secondary font-body-md">Features</span>
+<span class="text-secondary font-body-md">Pricing</span>
+<span class="text-primary font-bold border-b-2 border-primary">Editor</span>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg">Try for Free</button>
+</header>
+<!-- Predicted SideNavBar and Canvas Layout -->
+<div class="flex flex-1 overflow-hidden">
+<aside class="flex flex-col h-full py-lg px-md border-r border-primary w-64 bg-surface">
+<div class="mb-xl">
+<h2 class="font-label-bold text-label-bold text-primary uppercase tracking-widest">Tools</h2>
+<p class="text-body-sm text-secondary">PDF Editor</p>
+</div>
+<nav class="space-y-sm">
+<div class="flex items-center gap-md p-md bg-primary text-on-primary rounded-sm">
+<span class="material-symbols-outlined">edit</span>
+<span class="font-label-bold">Edit</span>
+</div>
+<div class="flex items-center gap-md p-md text-primary">
+<span class="material-symbols-outlined">layers</span>
+<span class="font-label-bold">Pages</span>
+</div>
+<div class="flex items-center gap-md p-md text-primary">
+<span class="material-symbols-outlined">title</span>
+<span class="font-label-bold">Text</span>
+</div>
+</nav>
+</aside>
+<main class="flex-1 bg-surface-container flex items-center justify-center p-xl">
+<!-- Empty State Content Canvas -->
+<div class="w-full max-w-4xl h-full border border-primary bg-white flex flex-col items-center justify-center gap-md">
+<span class="material-symbols-outlined text-[64px]" style="font-variation-settings: 'wght' 200;">description</span>
+<p class="font-body-lg text-secondary">No document loaded</p>
+</div>
+</main>
+</div>
+</div>
+<!-- MODAL OVERLAY -->
+<div class="fixed inset-0 z-50 flex items-center justify-center overlay-stipple p-margin-mobile" id="modalOverlay">
+<!-- MODAL CONTAINER -->
+<div class="relative w-full max-w-lg bg-white border-2 border-primary modal-shadow-block animate-in fade-in zoom-in duration-200">
+<!-- HEADER -->
+<header class="flex items-center justify-between px-lg py-md border-b border-primary">
+<h2 class="font-headline-md text-headline-md text-primary">Upload Your PDF</h2>
+<button class="p-xs hover:bg-surface-container-highest transition-colors" id="closeBtn">
+<span class="material-symbols-outlined text-primary">close</span>
+</button>
+</header>
+<!-- CONTENT -->
+<div class="p-lg">
+<!-- Upload Area -->
+<label class="drag-zone group flex flex-col items-center justify-center w-full h-64 cursor-pointer bg-surface hover:bg-surface-container-low" for="fileUpload">
+<input accept=".pdf" class="hidden" id="fileUpload" type="file"/>
+<div class="flex flex-col items-center justify-center space-y-md">
+<div class="w-16 h-16 border border-primary flex items-center justify-center bg-white group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[32px]">upload_file</span>
+</div>
+<div class="text-center">
+<p class="font-label-bold text-label-bold text-primary">Click to browse or drag &amp; drop</p>
+<p class="font-body-sm text-secondary mt-xs hidden" id="fileName"></p>
+</div>
+</div>
+</label>
+<!-- Help Text -->
+<div class="mt-md flex items-center justify-between">
+<div class="flex items-center gap-xs text-secondary">
+<span class="material-symbols-outlined text-[16px]">info</span>
+<span class="font-body-sm text-body-sm">Supported: .pdf files only. Max size: 25MB</span>
+</div>
+</div>
+</div>
+<!-- FOOTER / PRIMARY ACTION -->
+<footer class="p-lg pt-0">
+<button class="primary-btn w-full py-md font-label-bold text-label-bold flex items-center justify-center gap-sm" id="uploadBtn">
+                    Upload &amp; Start Editing
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</footer>
+<!-- DECORATIVE CORNER ELEMENT (Minimalist Detail) -->
+<div class="absolute -top-1 -left-1 w-2 h-2 bg-primary"></div>
+<div class="absolute -top-1 -right-1 w-2 h-2 bg-primary"></div>
+<div class="absolute -bottom-1 -left-1 w-2 h-2 bg-primary"></div>
+<div class="absolute -bottom-1 -right-1 w-2 h-2 bg-primary"></div>
+</div>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        const dragZone = document.querySelector('.drag-zone');
+        const fileInput = document.getElementById('fileUpload');
+        const fileNameDisplay = document.getElementById('fileName');
+        const closeBtn = document.getElementById('closeBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+
+        // Drag and drop states
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dragZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dragZone.classList.add('active');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dragZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dragZone.classList.remove('active');
+            }, false);
+        });
+
+        dragZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'application/pdf') {
+                    fileNameDisplay.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    fileNameDisplay.classList.remove('hidden');
+                    fileNameDisplay.classList.add('text-primary', 'font-bold');
+                } else {
+                    alert('Please select a valid PDF file.');
+                }
+            }
+        }
+
+        // Close logic
+        closeBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'none';
+        });
+
+        // Simple button active state feedback
+        uploadBtn.addEventListener('mousedown', () => {
+            uploadBtn.style.transform = 'scale(0.98)';
+        });
+        uploadBtn.addEventListener('mouseup', () => {
+            uploadBtn.style.transform = 'scale(1)';
+        });
+
+        // Close on clicking overlay (optional but standard)
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.style.display = 'none';
+            }
+        });
+    </script>
+</body></html>

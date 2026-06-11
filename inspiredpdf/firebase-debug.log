@@ -1,0 +1,449 @@
+[debug] [2026-06-11T11:28:23.332Z] ----------------------------------------------------------------------
+[debug] [2026-06-11T11:28:23.339Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Asus\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
+[debug] [2026-06-11T11:28:23.340Z] CLI Version:   14.11.0
+[debug] [2026-06-11T11:28:23.340Z] Platform:      win32
+[debug] [2026-06-11T11:28:23.340Z] Node Version:  v22.17.0
+[debug] [2026-06-11T11:28:23.341Z] Time:          Thu Jun 11 2026 16:58:23 GMT+0530 (India Standard Time)
+[debug] [2026-06-11T11:28:23.341Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-06-11T11:28:23.346Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-06-11T11:28:23.869Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-06-11T11:28:23.870Z] > authorizing via signed-in user (thedrivecore@gmail.com)
+[debug] [2026-06-11T11:28:24.248Z] openjdk version "17.0.15" 2025-04-15
+
+[debug] [2026-06-11T11:28:24.250Z] OpenJDK Runtime Environment Temurin-17.0.15+6 (build 17.0.15+6)
+OpenJDK 64-Bit Server VM Temurin-17.0.15+6 (build 17.0.15+6, mixed mode, sharing)
+
+[debug] [2026-06-11T11:28:24.304Z] Parsed Java major version: 17
+[info] i  emulators: Starting emulators: functions, firestore, hosting, storage, extensions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions, firestore, hosting, storage, extensions"}}
+[debug] [2026-06-11T11:28:24.310Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:24.310Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:24.311Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:28:24.313Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:28:24.313Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:24.617Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:28:24.618Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:24.618Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/inspiredpdf/services/cloudresourcemanager.googleapis.com [none]
+[debug] [2026-06-11T11:28:24.619Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/inspiredpdf/services/cloudresourcemanager.googleapis.com x-goog-quota-user=projects/inspiredpdf
+[debug] [2026-06-11T11:28:25.178Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-06-11T11:28:25.178Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-06-11T11:28:28.208Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/inspiredpdf/services/cloudresourcemanager.googleapis.com 401
+[debug] [2026-06-11T11:28:28.208Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/inspiredpdf/services/cloudresourcemanager.googleapis.com [omitted]
+[debug] [2026-06-11T11:28:28.209Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-06-11T11:28:28.209Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:28.209Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:28.209Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:28:28.210Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:28:28.210Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:28.396Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:28:28.396Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:28.397Z] Unable to check that https://cloudresourcemanager.googleapis.com is enabled on inspiredpdf. Calls to it will fail if it is not enabled
+[debug] [2026-06-11T11:28:28.398Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:28.398Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:28.398Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:28:28.399Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:28:28.399Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:28.513Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:28:28.514Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:28.514Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/inspiredpdf [none]
+[debug] [2026-06-11T11:28:30.020Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/inspiredpdf 401
+[debug] [2026-06-11T11:28:30.020Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/inspiredpdf {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.cloudresourcemanager.v1.Projects.GetProject","service":"cloudresourcemanager.googleapis.com"}}]}}
+[debug] [2026-06-11T11:28:30.020Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-06-11T11:28:30.020Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:30.020Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:30.020Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:28:30.021Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:28:30.021Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:30.133Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:28:30.134Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] !!  extensions: Unable to look up project number for inspiredpdf.
+ If this is a real project, ensure that you are logged in and have access to it.
+ If this is a fake project, please use a project ID starting with 'demo-' to skip production calls.
+ Continuing with a fake project number - secrets and other features that require production access may behave unexpectedly. {"metadata":{"emulator":{"name":"extensions"},"message":"Unable to look up project number for inspiredpdf.\n If this is a real project, ensure that you are logged in and have access to it.\n If this is a fake project, please use a project ID starting with 'demo-' to skip production calls.\n Continuing with a fake project number - secrets and other features that require production access may behave unexpectedly."}}
+[debug] [2026-06-11T11:28:30.184Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-06-11T11:28:30.184Z] [firestore] Firestore Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-06-11T11:28:30.185Z] [firestore.websocket] websocket server for firestore only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-06-11T11:28:30.185Z] [hosting] Hosting Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-06-11T11:28:30.185Z] [storage] Storage Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-06-11T11:28:30.185Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8080}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}],"hosting":[{"address":"127.0.0.1","family":"IPv4","port":5000}],"storage":[{"address":"127.0.0.1","family":"IPv4","port":9199}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-06-11T11:28:30.200Z] [hub] writing locator at C:\Users\Asus\AppData\Local\Temp\hub-inspiredpdf.json
+[debug] [2026-06-11T11:28:30.225Z] [Extensions] Started Extensions emulator, this is a noop.
+[debug] [2026-06-11T11:28:30.235Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-06-11T11:28:30.235Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-06-11T11:28:30.235Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-06-11T11:28:30.235Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"firestore":[{"address":"127.0.0.1","family":"IPv4","port":8080}],"firestore.websocket":[{"address":"127.0.0.1","family":"IPv4","port":9150}],"hosting":[{"address":"127.0.0.1","family":"IPv4","port":5000}],"storage":[{"address":"127.0.0.1","family":"IPv4","port":9199}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] !  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, database, pubsub, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, database, pubsub, dataconnect\u001b[22m"}}
+[debug] [2026-06-11T11:28:30.342Z] defaultcredentials: writing to file C:\Users\Asus\AppData\Roaming\firebase\thedrivecore_gmail_com_application_default_credentials.json
+[debug] [2026-06-11T11:28:30.345Z] Setting GAC to C:\Users\Asus\AppData\Roaming\firebase\thedrivecore_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\Asus\\AppData\\Roaming\\firebase\\thedrivecore_gmail_com_application_default_credentials.json"}}
+[debug] [2026-06-11T11:28:30.347Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:30.347Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:30.347Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:28:30.348Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:28:30.348Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:30.475Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:28:30.476Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:30.476Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/inspiredpdf/adminSdkConfig [none]
+[debug] [2026-06-11T11:28:31.077Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/inspiredpdf/adminSdkConfig 401
+[debug] [2026-06-11T11:28:31.077Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/inspiredpdf/adminSdkConfig {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2026-06-11T11:28:31.078Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-06-11T11:28:31.078Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:31.078Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:28:31.078Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:28:31.079Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:28:31.079Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:31.204Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:28:31.204Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:28:31.205Z] Failed to get Admin SDK config for inspiredpdf, falling back to cache Failed to get Admin SDK for Firebase project inspiredpdf. Please make sure the project exists and your account has permission to access it. {"name":"FirebaseError","children":[],"exit":2,"message":"Failed to get Admin SDK for Firebase project inspiredpdf. Please make sure the project exists and your account has permission to access it.","original":{"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}},"response":{"statusCode":401}},"exit":1,"message":"Request to https://firebase.googleapis.com/v1beta1/projects/inspiredpdf/adminSdkConfig had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":401},"status":500}
+[warn] !  functions: Unable to fetch project Admin SDK configuration, Admin SDK behavior in Cloud Functions emulator may be incorrect. {"metadata":{"emulator":{"name":"functions"},"message":"Unable to fetch project Admin SDK configuration, Admin SDK behavior in Cloud Functions emulator may be incorrect."}}
+[info] i  firestore: downloading cloud-firestore-emulator-v1.19.8.jar... {"metadata":{"emulator":{"name":"firestore"},"message":"downloading cloud-firestore-emulator-v1.19.8.jar..."}}
+[debug] [2026-06-11T11:28:31.251Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-firestore-emulator-v1.19.8.jar 
+[debug] [2026-06-11T11:28:31.961Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-firestore-emulator-v1.19.8.jar 200
+[debug] [2026-06-11T11:28:31.961Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-firestore-emulator-v1.19.8.jar [stream]
+[debug] [2026-06-11T11:29:09.564Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2026-06-11T11:29:09.564Z] Ignoring unsupported arg: single_project_mode_error {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: single_project_mode_error"}}
+[debug] [2026-06-11T11:29:09.564Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","C:\\Users\\Asus\\.cache\\firebase\\emulators\\cloud-firestore-emulator-v1.19.8.jar","--host","127.0.0.1","--port",8080,"--websocket_port",9150,"--project_id","inspiredpdf","--rules","C:\\Users\\Asus\\Music\\InspiredPDF\\inspiredpdf\\firestore.rules","--single_project_mode",true,"--functions_emulator","127.0.0.1:5001"],"optionalArgs":["port","webchannel_port","host","rules","websocket_port","functions_emulator","seed_from_export","project_id","single_project_mode"],"joinArgs":false,"shell":false,"port":8080} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"C:\\\\Users\\\\Asus\\\\.cache\\\\firebase\\\\emulators\\\\cloud-firestore-emulator-v1.19.8.jar\",\"--host\",\"127.0.0.1\",\"--port\",8080,\"--websocket_port\",9150,\"--project_id\",\"inspiredpdf\",\"--rules\",\"C:\\\\Users\\\\Asus\\\\Music\\\\InspiredPDF\\\\inspiredpdf\\\\firestore.rules\",\"--single_project_mode\",true,\"--functions_emulator\",\"127.0.0.1:5001\"],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"websocket_port\",\"functions_emulator\",\"seed_from_export\",\"project_id\",\"single_project_mode\"],\"joinArgs\":false,\"shell\":false,\"port\":8080}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to \u001b[1mfirestore-debug.log\u001b[22m"}}
+[info] +  firestore: Firestore Emulator UI websocket is running on 9150. {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator UI websocket is running on 9150."}}
+[info] i  storage: downloading cloud-storage-rules-runtime-v1.1.3.jar... {"metadata":{"emulator":{"name":"storage"},"message":"downloading cloud-storage-rules-runtime-v1.1.3.jar..."}}
+[debug] [2026-06-11T11:29:09.609Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-storage-rules-runtime-v1.1.3.jar 
+[debug] [2026-06-11T11:29:09.963Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-storage-rules-runtime-v1.1.3.jar 200
+[debug] [2026-06-11T11:29:09.963Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/cloud-storage-rules-runtime-v1.1.3.jar [stream]
+[debug] [2026-06-11T11:29:12.652Z] Jun 11, 2026 4:59:12 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+INFO: Started WebSocket server on ws://127.0.0.1:9150
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Jun 11, 2026 4:59:12 PM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start\r\nINFO: Started WebSocket server on ws://127.0.0.1:9150\r\n"}}
+[debug] [2026-06-11T11:29:12.929Z] API endpoint: http://127.0.0.1:8080 {"metadata":{"emulator":{"name":"firestore"},"message":"API endpoint: http://127.0.0.1:8080"}}
+[debug] [2026-06-11T11:29:12.931Z] 
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080
+
+If you are running a Firestore in Datastore Mode project, run:
+
+   export DATASTORE_EMULATOR_HOST=127.0.0.1:8080
+
+Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
+Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":"\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\r\n\n   export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080\n\nIf you are running a Firestore in Datastore Mode project, run:\r\n\n   export DATASTORE_EMULATOR_HOST=127.0.0.1:8080\n\nNote: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.\r\nDev App Server is now running.\n\r\n"}}
+[debug] [2026-06-11T11:29:29.990Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"storage"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2026-06-11T11:29:32.088Z] Temp file directory for storage emulator: C:\Users\Asus\AppData\Local\Temp/firebase/storage/blobs {"metadata":{"emulator":{"name":"storage"},"message":"Temp file directory for storage emulator: C:\\Users\\Asus\\AppData\\Local\\Temp/firebase/storage/blobs"}}
+[debug] [2026-06-11T11:29:32.110Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:32.110Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:32.110Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:29:32.111Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:29:32.112Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:32.390Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:29:32.390Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:32.391Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/inspiredpdf/sites 
+[debug] [2026-06-11T11:29:33.401Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/inspiredpdf/sites 401
+[debug] [2026-06-11T11:29:33.401Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/inspiredpdf/sites {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2026-06-11T11:29:33.401Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-06-11T11:29:33.402Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:33.402Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:33.402Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:29:33.403Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:29:33.403Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:33.520Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:29:33.521Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:33.522Z] Failed to list hosting sites
+[debug] Request to https://firebasehosting.googleapis.com/v1beta1/projects/inspiredpdf/sites had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2026-06-11T11:29:33.523Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:33.523Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:33.523Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:29:33.523Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:29:33.523Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:33.626Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:29:33.627Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:33.627Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/inspiredpdf/webApps/-/config [none]
+[debug] [2026-06-11T11:29:33.962Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/inspiredpdf/webApps/-/config 401
+[debug] [2026-06-11T11:29:33.963Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/inspiredpdf/webApps/-/config {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2026-06-11T11:29:33.963Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-06-11T11:29:33.963Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:33.963Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:33.963Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:29:33.963Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:29:33.963Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:34.463Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:29:34.463Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:34.463Z] fetchWebSetup error: FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/inspiredpdf/webApps/-/config had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[warn] !  hosting: Could not fetch web app configuration and there is no cached configuration on this machine. Check your internet connection and make sure you are authenticated. To continue, you must call firebase.initializeApp({...}) in your code before using Firebase. 
+[debug] [2026-06-11T11:29:34.469Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:34.470Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:34.470Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:29:34.470Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:29:34.470Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:34.691Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:29:34.691Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:34.692Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/inspiredpdf [none]
+[debug] [2026-06-11T11:29:34.884Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/inspiredpdf 401
+[debug] [2026-06-11T11:29:34.885Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/inspiredpdf {"error":{"code":401,"message":"Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.","status":"UNAUTHENTICATED"}}
+[debug] [2026-06-11T11:29:34.885Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-06-11T11:29:34.885Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:34.885Z] Checked if tokens are valid: false, expires at: 1753000276801
+[debug] [2026-06-11T11:29:34.885Z] > refreshing access token with scopes: []
+[debug] [2026-06-11T11:29:34.886Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-11T11:29:34.886Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:35.012Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-06-11T11:29:35.012Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-11T11:29:35.013Z] Request to https://firebase.googleapis.com/v1beta1/projects/inspiredpdf had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[info] i  hosting[inspiredpdf]: Serving hosting files from: public {"metadata":{"emulator":{"name":"hosting"},"message":"Serving hosting files from: \u001b[1mpublic\u001b[22m"}}
+[info] +  hosting[inspiredpdf]: Local server: http://127.0.0.1:5000 {"metadata":{"emulator":{"name":"hosting"},"message":"Local server: \u001b[4m\u001b[1mhttp://127.0.0.1:5000\u001b[22m\u001b[24m"}}
+[info] i  ui: downloading ui-v1.15.0.zip... {"metadata":{"emulator":{"name":"ui"},"message":"downloading ui-v1.15.0.zip..."}}
+[debug] [2026-06-11T11:29:35.088Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 
+[debug] [2026-06-11T11:29:35.335Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 200
+[debug] [2026-06-11T11:29:35.335Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip [stream]
+[debug] [2026-06-11T11:29:37.286Z] Data is 3538469
+[debug] [2026-06-11T11:29:37.288Z] [unzip] Entry: client/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-06-11T11:29:37.288Z] [unzip] Processing entry: client\
+[debug] [2026-06-11T11:29:37.289Z] [unzip] mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\
+[debug] [2026-06-11T11:29:37.294Z] [unzip] Entry: client/favicon-16x16.png (compressed_size=293 bytes, uncompressed_size=293 bytes)
+[debug] [2026-06-11T11:29:37.295Z] [unzip] Processing entry: client\favicon-16x16.png
+[debug] [2026-06-11T11:29:37.295Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.297Z] [unzip] Writing file: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\favicon-16x16.png
+[debug] [2026-06-11T11:29:37.304Z] [unzip] Entry: client/safari-pinned-tab.svg (compressed_size=1433 bytes, uncompressed_size=2611 bytes)
+[debug] [2026-06-11T11:29:37.305Z] [unzip] Processing entry: client\safari-pinned-tab.svg
+[debug] [2026-06-11T11:29:37.305Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.307Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\safari-pinned-tab.svg
+[debug] [2026-06-11T11:29:37.339Z] [unzip] Entry: client/favicon.ico (compressed_size=2933 bytes, uncompressed_size=13294 bytes)
+[debug] [2026-06-11T11:29:37.339Z] [unzip] Processing entry: client\favicon.ico
+[debug] [2026-06-11T11:29:37.340Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.342Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\favicon.ico
+[debug] [2026-06-11T11:29:37.346Z] [unzip] Entry: client/index.html (compressed_size=1364 bytes, uncompressed_size=3071 bytes)
+[debug] [2026-06-11T11:29:37.346Z] [unzip] Processing entry: client\index.html
+[debug] [2026-06-11T11:29:37.347Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.348Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\index.html
+[debug] [2026-06-11T11:29:37.352Z] [unzip] Entry: client/android-chrome-192x192.png (compressed_size=2684 bytes, uncompressed_size=2684 bytes)
+[debug] [2026-06-11T11:29:37.352Z] [unzip] Processing entry: client\android-chrome-192x192.png
+[debug] [2026-06-11T11:29:37.352Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.354Z] [unzip] Writing file: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\android-chrome-192x192.png
+[debug] [2026-06-11T11:29:37.356Z] [unzip] Entry: client/apple-touch-icon.png (compressed_size=2123 bytes, uncompressed_size=2152 bytes)
+[debug] [2026-06-11T11:29:37.356Z] [unzip] Processing entry: client\apple-touch-icon.png
+[debug] [2026-06-11T11:29:37.356Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.358Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\apple-touch-icon.png
+[debug] [2026-06-11T11:29:37.362Z] [unzip] Entry: client/android-chrome-512x512.png (compressed_size=5369 bytes, uncompressed_size=5411 bytes)
+[debug] [2026-06-11T11:29:37.362Z] [unzip] Processing entry: client\android-chrome-512x512.png
+[debug] [2026-06-11T11:29:37.362Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.363Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\android-chrome-512x512.png
+[debug] [2026-06-11T11:29:37.366Z] [unzip] Entry: client/manifest.json (compressed_size=245 bytes, uncompressed_size=551 bytes)
+[debug] [2026-06-11T11:29:37.366Z] [unzip] Processing entry: client\manifest.json
+[debug] [2026-06-11T11:29:37.366Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.367Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\manifest.json
+[debug] [2026-06-11T11:29:37.372Z] [unzip] Entry: client/robots.txt (compressed_size=26 bytes, uncompressed_size=26 bytes)
+[debug] [2026-06-11T11:29:37.372Z] [unzip] Processing entry: client\robots.txt
+[debug] [2026-06-11T11:29:37.372Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.373Z] [unzip] Writing file: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\robots.txt
+[debug] [2026-06-11T11:29:37.374Z] [unzip] Entry: client/mstile-150x150.png (compressed_size=2034 bytes, uncompressed_size=2034 bytes)
+[debug] [2026-06-11T11:29:37.374Z] [unzip] Processing entry: client\mstile-150x150.png
+[debug] [2026-06-11T11:29:37.374Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.375Z] [unzip] Writing file: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\mstile-150x150.png
+[debug] [2026-06-11T11:29:37.376Z] [unzip] Entry: client/assets/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-06-11T11:29:37.377Z] [unzip] Processing entry: client\assets\
+[debug] [2026-06-11T11:29:37.377Z] [unzip] mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\
+[debug] [2026-06-11T11:29:37.377Z] [unzip] Entry: client/assets/index-BX-A56oj.js (compressed_size=582089 bytes, uncompressed_size=2092775 bytes)
+[debug] [2026-06-11T11:29:37.378Z] [unzip] Processing entry: client\assets\index-BX-A56oj.js
+[debug] [2026-06-11T11:29:37.378Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets
+[debug] [2026-06-11T11:29:37.380Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\index-BX-A56oj.js
+[debug] [2026-06-11T11:29:37.416Z] [unzip] Entry: client/assets/index-CjB9C900.css (compressed_size=35979 bytes, uncompressed_size=298654 bytes)
+[debug] [2026-06-11T11:29:37.416Z] [unzip] Processing entry: client\assets\index-CjB9C900.css
+[debug] [2026-06-11T11:29:37.417Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets
+[debug] [2026-06-11T11:29:37.417Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\index-CjB9C900.css
+[debug] [2026-06-11T11:29:37.427Z] [unzip] Entry: client/assets/index-BX-A56oj.js.map (compressed_size=2362482 bytes, uncompressed_size=10036679 bytes)
+[debug] [2026-06-11T11:29:37.427Z] [unzip] Processing entry: client\assets\index-BX-A56oj.js.map
+[debug] [2026-06-11T11:29:37.427Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets
+[debug] [2026-06-11T11:29:37.428Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\index-BX-A56oj.js.map
+[debug] [2026-06-11T11:29:37.560Z] [unzip] Entry: client/assets/extensions/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-06-11T11:29:37.561Z] [unzip] Processing entry: client\assets\extensions\
+[debug] [2026-06-11T11:29:37.561Z] [unzip] mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\extensions\
+[debug] [2026-06-11T11:29:37.562Z] [unzip] Entry: client/assets/extensions/default-extension.png (compressed_size=1646 bytes, uncompressed_size=1657 bytes)
+[debug] [2026-06-11T11:29:37.562Z] [unzip] Processing entry: client\assets\extensions\default-extension.png
+[debug] [2026-06-11T11:29:37.562Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\extensions
+[debug] [2026-06-11T11:29:37.564Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\extensions\default-extension.png
+[debug] [2026-06-11T11:29:37.567Z] [unzip] Entry: client/assets/img/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-06-11T11:29:37.567Z] [unzip] Processing entry: client\assets\img\
+[debug] [2026-06-11T11:29:37.567Z] [unzip] mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\img\
+[debug] [2026-06-11T11:29:37.568Z] [unzip] Entry: client/assets/img/database.png (compressed_size=29449 bytes, uncompressed_size=29988 bytes)
+[debug] [2026-06-11T11:29:37.569Z] [unzip] Processing entry: client\assets\img\database.png
+[debug] [2026-06-11T11:29:37.569Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\img
+[debug] [2026-06-11T11:29:37.570Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\img\database.png
+[debug] [2026-06-11T11:29:37.573Z] [unzip] Entry: client/assets/provider-icons/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-06-11T11:29:37.573Z] [unzip] Processing entry: client\assets\provider-icons\
+[debug] [2026-06-11T11:29:37.573Z] [unzip] mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\
+[debug] [2026-06-11T11:29:37.573Z] [unzip] Entry: client/assets/provider-icons/auth_service_saml.svg (compressed_size=575 bytes, uncompressed_size=1226 bytes)
+[debug] [2026-06-11T11:29:37.574Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_saml.svg
+[debug] [2026-06-11T11:29:37.574Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.574Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_saml.svg
+[debug] [2026-06-11T11:29:37.576Z] [unzip] Entry: client/assets/provider-icons/auth_service_phone.svg (compressed_size=261 bytes, uncompressed_size=414 bytes)
+[debug] [2026-06-11T11:29:37.576Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_phone.svg
+[debug] [2026-06-11T11:29:37.576Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.577Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_phone.svg
+[debug] [2026-06-11T11:29:37.579Z] [unzip] Entry: client/assets/provider-icons/auth_service_facebook.svg (compressed_size=289 bytes, uncompressed_size=457 bytes)
+[debug] [2026-06-11T11:29:37.579Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_facebook.svg
+[debug] [2026-06-11T11:29:37.579Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.580Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_facebook.svg
+[debug] [2026-06-11T11:29:37.608Z] [unzip] Entry: client/assets/provider-icons/auth_service_game_center.svg (compressed_size=991 bytes, uncompressed_size=3921 bytes)
+[debug] [2026-06-11T11:29:37.609Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_game_center.svg
+[debug] [2026-06-11T11:29:37.609Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.610Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_game_center.svg
+[debug] [2026-06-11T11:29:37.613Z] [unzip] Entry: client/assets/provider-icons/auth_service_apple.svg (compressed_size=230 bytes, uncompressed_size=334 bytes)
+[debug] [2026-06-11T11:29:37.613Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_apple.svg
+[debug] [2026-06-11T11:29:37.613Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.613Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_apple.svg
+[debug] [2026-06-11T11:29:37.616Z] [unzip] Entry: client/assets/provider-icons/auth_service_github.svg (compressed_size=466 bytes, uncompressed_size=838 bytes)
+[debug] [2026-06-11T11:29:37.616Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_github.svg
+[debug] [2026-06-11T11:29:37.616Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.618Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_github.svg
+[debug] [2026-06-11T11:29:37.621Z] [unzip] Entry: client/assets/provider-icons/auth_service_mslive.svg (compressed_size=203 bytes, uncompressed_size=378 bytes)
+[debug] [2026-06-11T11:29:37.621Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_mslive.svg
+[debug] [2026-06-11T11:29:37.621Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.622Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_mslive.svg
+[debug] [2026-06-11T11:29:37.625Z] [unzip] Entry: client/assets/provider-icons/auth_service_yahoo.svg (compressed_size=577 bytes, uncompressed_size=1182 bytes)
+[debug] [2026-06-11T11:29:37.625Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_yahoo.svg
+[debug] [2026-06-11T11:29:37.626Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.627Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_yahoo.svg
+[debug] [2026-06-11T11:29:37.631Z] [unzip] Entry: client/assets/provider-icons/auth_service_twitter.svg (compressed_size=444 bytes, uncompressed_size=751 bytes)
+[debug] [2026-06-11T11:29:37.631Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_twitter.svg
+[debug] [2026-06-11T11:29:37.631Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.633Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_twitter.svg
+[debug] [2026-06-11T11:29:37.638Z] [unzip] Entry: client/assets/provider-icons/auth_service_play_games.svg (compressed_size=565 bytes, uncompressed_size=1173 bytes)
+[debug] [2026-06-11T11:29:37.638Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_play_games.svg
+[debug] [2026-06-11T11:29:37.639Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.640Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_play_games.svg
+[debug] [2026-06-11T11:29:37.642Z] [unzip] Entry: client/assets/provider-icons/auth_service_email.svg (compressed_size=228 bytes, uncompressed_size=326 bytes)
+[debug] [2026-06-11T11:29:37.642Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_email.svg
+[debug] [2026-06-11T11:29:37.642Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.643Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_email.svg
+[debug] [2026-06-11T11:29:37.645Z] [unzip] Entry: client/assets/provider-icons/auth_service_google.svg (compressed_size=409 bytes, uncompressed_size=720 bytes)
+[debug] [2026-06-11T11:29:37.645Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_google.svg
+[debug] [2026-06-11T11:29:37.645Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.646Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_google.svg
+[debug] [2026-06-11T11:29:37.648Z] [unzip] Entry: client/assets/provider-icons/auth_service_oidc.svg (compressed_size=414 bytes, uncompressed_size=858 bytes)
+[debug] [2026-06-11T11:29:37.648Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_oidc.svg
+[debug] [2026-06-11T11:29:37.648Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-06-11T11:29:37.648Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_oidc.svg
+[debug] [2026-06-11T11:29:37.651Z] [unzip] Entry: client/browserconfig.xml (compressed_size=491 bytes, uncompressed_size=822 bytes)
+[debug] [2026-06-11T11:29:37.651Z] [unzip] Processing entry: client\browserconfig.xml
+[debug] [2026-06-11T11:29:37.651Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.652Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\browserconfig.xml
+[debug] [2026-06-11T11:29:37.657Z] [unzip] Entry: client/favicon-32x32.png (compressed_size=475 bytes, uncompressed_size=475 bytes)
+[debug] [2026-06-11T11:29:37.657Z] [unzip] Processing entry: client\favicon-32x32.png
+[debug] [2026-06-11T11:29:37.658Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-06-11T11:29:37.659Z] [unzip] Writing file: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\client\favicon-32x32.png
+[debug] [2026-06-11T11:29:37.661Z] [unzip] Entry: server/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-06-11T11:29:37.661Z] [unzip] Processing entry: server\
+[debug] [2026-06-11T11:29:37.661Z] [unzip] mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\server\
+[debug] [2026-06-11T11:29:37.662Z] [unzip] Entry: server/server.mjs.map (compressed_size=217845 bytes, uncompressed_size=944978 bytes)
+[debug] [2026-06-11T11:29:37.662Z] [unzip] Processing entry: server\server.mjs.map
+[debug] [2026-06-11T11:29:37.662Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\server
+[debug] [2026-06-11T11:29:37.662Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\server\server.mjs.map
+[debug] [2026-06-11T11:29:37.674Z] [unzip] Entry: server/server.mjs (compressed_size=276407 bytes, uncompressed_size=933701 bytes)
+[debug] [2026-06-11T11:29:37.675Z] [unzip] Processing entry: server\server.mjs
+[debug] [2026-06-11T11:29:37.675Z] [unzip] else mkdir: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\server
+[debug] [2026-06-11T11:29:37.675Z] [unzip] deflating: C:\Users\Asus\.cache\firebase\emulators\ui-v1.15.0\server\server.mjs
+[debug] [2026-06-11T11:29:37.692Z] [Extensions] Connecting Extensions emulator, this is a noop.
+[info] i  functions: Watching "C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"C:\\Users\\Asus\\Music\\InspiredPDF\\inspiredpdf\\functions\" for Cloud Functions..."}}
+[debug] [2026-06-11T11:29:37.707Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2026-06-11T11:29:40.840Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for InspiredPDF",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^6.0.0",
+    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^3.11.174",
+    "pdf-lib": "^1.17.0",
+    "@genkit-ai/core": "^0.5.5",
+    "@genkit-ai/firebase": "^0.5.5",
+    "@genkit-ai/googleai": "^0.5.5",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2026-06-11T11:29:40.841Z] Building nodejs source
+[debug] [2026-06-11T11:29:40.842Z] Failed to find version of module node: reached end of search path C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\node_modules
+[info] +  functions: Using node@22 from host. 
+[debug] [2026-06-11T11:29:40.849Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-06-11T11:29:40.869Z] Found firebase-functions binary at 'C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8751
+
+[info] Warning: Cannot polyfill `DOMMatrix`, rendering may be broken: "Error: Cannot find module 'canvas'
+Require stack:
+- C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\node_modules\pdfjs-dist\legacy\build\pdf.js
+- C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\index.js
+- C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\node_modules\firebase-functions\lib\runtime\loader.js
+- C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\node_modules\firebase-functions\lib\bin\firebase-functions.js".
+
+[info] Warning: Cannot polyfill `Path2D`, rendering may be broken: "Error: Cannot find module 'canvas'
+Require stack:
+- C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\node_modules\pdfjs-dist\legacy\build\pdf.js
+- C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\index.js
+- C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\node_modules\firebase-functions\lib\runtime\loader.js
+- C:\Users\Asus\Music\InspiredPDF\inspiredpdf\functions\node_modules\firebase-functions\lib\bin\firebase-functions.js".
+
+[error] Warning: Model 'googleai/gemini-pro-vision' is deprecated and may be removed in a future release.
+
+[info] Registering plugin googleai...
+
+[info] Registering flow state stores...
+Registering trace stores...
+`traceStore` is not specified in the config; Traces are not going to be persisted in prod.
+
+[debug] [2026-06-11T11:29:46.125Z] Got response from /__/functions.yaml {"endpoints":{"analyzePDF":{"availableMemoryMb":512,"timeoutSeconds":120,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"documents/{docId}"},"retry":false},"entryPoint":"analyzePDF"},"generatePDF":{"availableMemoryMb":512,"timeoutSeconds":120,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"callableTrigger":{},"entryPoint":"generatePDF"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2026-06-11T11:29:50.235Z] defaultcredentials: writing to file C:\Users\Asus\AppData\Roaming\firebase\thedrivecore_gmail_com_application_default_credentials.json
+[debug] [2026-06-11T11:29:50.239Z] Setting GAC to C:\Users\Asus\AppData\Roaming\firebase\thedrivecore_gmail_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\Asus\\AppData\\Roaming\\firebase\\thedrivecore_gmail_com_application_default_credentials.json"}}
+[info] +  functions: Loaded functions definitions from source: analyzePDF, generatePDF. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: analyzePDF, generatePDF."}}
+[debug] [2026-06-11T11:29:50.249Z] Found a v2 firestore trigger.
+[debug] [2026-06-11T11:29:50.249Z] addFirestoreTrigger "{\"eventType\":\"google.cloud.firestore.document.v1.created\",\"database\":\"(default)\",\"namespace\":\"(default)\",\"document\":{\"value\":\"documents/{docId}\",\"matchType\":\"PATH_PATTERN\"}}"
+[debug] [2026-06-11T11:29:50.250Z] >>> [apiv2][query] POST http://127.0.0.1:8080/emulator/v1/projects/inspiredpdf/eventarcTrigger?eventarcTriggerId=us-central1-analyzePDF-0 [none]
+[debug] [2026-06-11T11:29:50.250Z] >>> [apiv2][body] POST http://127.0.0.1:8080/emulator/v1/projects/inspiredpdf/eventarcTrigger?eventarcTriggerId=us-central1-analyzePDF-0 "{\"eventType\":\"google.cloud.firestore.document.v1.created\",\"database\":\"(default)\",\"namespace\":\"(default)\",\"document\":{\"value\":\"documents/{docId}\",\"matchType\":\"PATH_PATTERN\"}}"
+[debug] [2026-06-11T11:29:50.374Z] Jun 11, 2026 4:59:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Jun 11, 2026 4:59:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected non-HTTP/2 connection.\r\n"}}
+[debug] [2026-06-11T11:29:50.878Z] Jun 11, 2026 4:59:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+ {"metadata":{"emulator":{"name":"firestore"},"message":"Jun 11, 2026 4:59:50 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead\r\nINFO: Detected HTTP/2 connection.\r\n"}}
+[debug] [2026-06-11T11:29:52.772Z] <<< [apiv2][status] POST http://127.0.0.1:8080/emulator/v1/projects/inspiredpdf/eventarcTrigger?eventarcTriggerId=us-central1-analyzePDF-0 200
+[debug] [2026-06-11T11:29:52.773Z] <<< [apiv2][body] POST http://127.0.0.1:8080/emulator/v1/projects/inspiredpdf/eventarcTrigger?eventarcTriggerId=us-central1-analyzePDF-0 {"eventType":"google.cloud.firestore.document.v1.created","database":"(default)","namespace":"(default)","document":{"value":"documents/{docId}","matchType":"PATH_PATTERN"}}
+[info] +  functions[us-central1-analyzePDF]: firestore function initialized. {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mfirestore\u001b[22m function initialized."}}
+[info] +  functions[us-central1-generatePDF]: http function initialized (http://127.0.0.1:5001/inspiredpdf/us-central1/generatePDF). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/inspiredpdf/us-central1/generatePDF)."}}
+[debug] [2026-06-11T11:29:52.787Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────┬────────────────┬──────────────────────────────────┐
+│ Emulator   │ Host:Port      │ View in Emulator UI              │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Functions  │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions  │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Firestore  │ 127.0.0.1:8080 │ http://127.0.0.1:4000/firestore  │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Hosting    │ 127.0.0.1:5000 │ n/a                              │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Storage    │ 127.0.0.1:9199 │ http://127.0.0.1:4000/storage    │
+├────────────┼────────────────┼──────────────────────────────────┤
+│ Extensions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/extensions │
+└────────────┴────────────────┴──────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500, 9150
+┌─────────────────────────┬───────────────┬─────────────────────┐
+│ Extension Instance Name │ Extension Ref │ View in Emulator UI │
+└─────────────────────────┴───────────────┴─────────────────────┘
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
