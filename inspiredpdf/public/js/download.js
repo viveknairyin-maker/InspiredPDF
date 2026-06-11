@@ -83,15 +83,7 @@ if (downloadBtn) {
       for (const [blockId, edit] of Object.entries(edits)) {
         const page = pdfDoc.getPage(edit.pageNumber - 1);
         
-        // Redact original text with white rectangle
-        page.drawRectangle({
-          x: edit.x - 1,
-          y: edit.y - 2,
-          width: edit.width + 2,
-          height: edit.height + 4,
-          color: rgb(1, 1, 1),
-          opacity: 1
-        });
+        // No hardcoded white masking applied here to preserve complex backgrounds
         
         // Embed font (use standard fonts for reliability)
         let font;

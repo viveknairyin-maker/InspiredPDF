@@ -399,19 +399,7 @@ async function renderPage(pageNumber) {
   };
   await page.render(renderContext).promise;
   
-  // Cover original PDF text on the canvas for all edited blocks
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#ffffff'; // White page background
-  analysisPage.textBlocks.forEach(block => {
-    const edit = window.InspiredPDF.edits[block.id];
-    if (edit) {
-      const left = block.x * scale;
-      const top = (analysisPage.height - block.y - block.height) * scale;
-      const width = block.width * scale;
-      const height = block.height * scale;
-      ctx.fillRect(left - 1, top - 2, width + 2, height + 4);
-    }
-  });
+  // No hardcoded white masking applied here to preserve complex backgrounds
   
   renderOverlays(pageNumber, scale, analysisPage.height);
   
@@ -508,18 +496,7 @@ function activateEditBlock(block, scale) {
   overlayDiv.style.setProperty('background', 'transparent', 'important');
   overlayDiv.style.setProperty('background-color', 'transparent', 'important');
   
-  // Erase original text from the canvas context underneath this active block immediately to prevent overlaps while typing
-  const canvas = canvasContainer.querySelector('canvas');
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    const analysisPage = window.InspiredPDF.analysis.pages[currentPage - 1];
-    const left = block.x * scale;
-    const top = (analysisPage.height - block.y - block.height) * scale;
-    const width = block.width * scale;
-    const height = block.height * scale;
-    ctx.fillRect(left - 1, top - 2, width + 2, height + 4);
-  }
+  // No hardcoded white masking applied here to preserve complex backgrounds
 
   const edit = window.InspiredPDF.edits[blockId];
   const fontName = edit ? edit.fontFamily : block.matchedGoogleFont;
