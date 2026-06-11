@@ -1,21 +1,20 @@
 import { db, storage, authPromise } from './app.js';
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // DOM Elements
-const uploadStartBtn = document.getElementById('upload-start-btn');
-const navTryBtn = document.getElementById('nav-try-btn');
-const mainDropZone = document.getElementById('drop-zone');
-const modalOverlay = document.getElementById('modalOverlay');
-const closeBtn = document.getElementById('closeBtn');
-const fileInput = document.getElementById('fileUpload');
-const fileNameDisplay = document.getElementById('fileName');
-const modalDragZone = document.getElementById('modal-drag-zone');
 const uploadBtn = document.getElementById('uploadBtn');
+const dropZone = document.getElementById('dropZone');
+const modalOverlay = document.getElementById('modalOverlay');
+const modalClose = document.getElementById('modalClose');
+const pdfFileInput = document.getElementById('pdfFileInput');
+const modalDropZone = document.getElementById('modalDropZone');
+const fileNameDisplay = document.getElementById('fileName');
 const uploadError = document.getElementById('upload-error');
 const modalLoading = document.getElementById('modalLoading');
 const modalLoadingText = document.getElementById('modalLoadingText');
 const modalFooter = document.getElementById('modalFooter');
+const modalUploadBtn = document.getElementById('modalUploadBtn');
 
 let selectedFile = null;
 
@@ -35,7 +34,7 @@ function openModal() {
   modalOverlay.style.display = 'flex';
   hideError();
   selectedFile = null;
-  fileInput.value = '';
+  pdfFileInput.value = '';
   fileNameDisplay.textContent = '';
   fileNameDisplay.classList.add('hidden');
   modalLoading.classList.add('hidden');
@@ -46,25 +45,64 @@ function closeModal() {
   modalOverlay.style.display = 'none';
 }
 
-if (uploadStartBtn) uploadStartBtn.addEventListener('click', openModal);
-if (navTryBtn) navTryBtn.addEventListener('click', openModal);
-if (closeBtn) closeBtn.addEventListener('click', closeModal);
+// Bind modal trigger buttons (Fix 3)
+if (uploadBtn) {
+  uploadBtn.addEventListener("click", () => {
+    openModal();
+  });
+}
 
+if (modalClose) {
+  modalClose.addEventListener("click", () => {
+    closeModal();
+  });
+}
+
+if (dropZone) {
+  dropZone.addEventListener("click", () => {
+    openModal();
+  });
+  
+  // Wire drag & drop on landing page dropZone to open modal and handle file
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add('active');
+  });
+  
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove('active');
+  });
+  
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('active');
+    openModal();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+}
+
+// Close modal if clicked outside of container
 modalOverlay.addEventListener('click', (e) => {
-  if (e.target === modalOverlay) closeModal();
+  if (e.target === modalOverlay) {
+    closeModal();
+  }
 });
 
-// File validation & selection
-function validateAndSelectFile(file) {
+// File validation, upload, and redirect (Fix 4)
+async function handleFile(file) {
   if (!file) return;
 
-  if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+  // Validate file type
+  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
     showError('Please upload a valid PDF file.');
     selectedFile = null;
     fileNameDisplay.classList.add('hidden');
     return;
   }
 
+  // Validate file size (25MB limit)
   if (file.size > 25 * 1024 * 1024) {
     showError('File too large. Maximum size is 25MB.');
     selectedFile = null;
@@ -76,97 +114,91 @@ function validateAndSelectFile(file) {
   selectedFile = file;
   fileNameDisplay.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
   fileNameDisplay.classList.remove('hidden');
+
+  try {
+    // Ensure user is signed in
+    const user = await authPromise;
+    const userId = user.uid;
+
+    // Toggle loading screen
+    modalLoading.classList.remove('hidden');
+    modalFooter.classList.add('hidden');
+    modalLoadingText.textContent = "Uploading PDF...";
+
+    const timestamp = Date.now();
+    const storagePath = `uploads/${userId}/${timestamp}_${selectedFile.name}`;
+    const storageRef = ref(storage, storagePath);
+
+    // 1. Upload bytes to Firebase Storage
+    const snapshot = await uploadBytes(storageRef, selectedFile);
+    const downloadUrl = await getDownloadURL(snapshot.ref);
+
+    // 2. Update loading screen to "Analyzing your PDF..."
+    modalLoadingText.textContent = "Analyzing your PDF...";
+
+    // 3. Create Firestore document (this will trigger analyzePDF automatically via onCreate)
+    const docRef = await addDoc(collection(db, 'documents'), {
+      userId: userId,
+      fileName: selectedFile.name,
+      fileSize: selectedFile.size,
+      uploadedAt: serverTimestamp(),
+      storageUrl: downloadUrl,
+      storagePath: storagePath,
+      status: "processing"
+    });
+
+    console.log(`Document created with ID: ${docRef.id}`);
+
+    // Redirect to editor page using absolute path (Fix 6)
+    window.location.href = `/editor?docId=${docRef.id}`;
+  } catch (error) {
+    console.error("Upload process failed:", error);
+    showError(`Upload failed: ${error.message}`);
+    modalLoading.classList.add('hidden');
+    modalFooter.classList.remove('hidden');
+  }
 }
 
-// Drag & Drop event bindings
-function bindDragEvents(element) {
-  if (!element) return;
-  
-  ['dragenter', 'dragover'].forEach(eventName => {
-    element.addEventListener(eventName, (e) => {
-      e.preventDefault();
-      element.classList.add('bg-primary-fixed', 'active');
-    }, false);
+// Bind modal drop zone click and file input change (Fix 4)
+if (modalDropZone) {
+  modalDropZone.addEventListener("click", () => {
+    pdfFileInput.click();
   });
 
-  ['dragleave', 'drop'].forEach(eventName => {
-    element.addEventListener(eventName, (e) => {
-      e.preventDefault();
-      element.classList.remove('bg-primary-fixed', 'active');
-    }, false);
+  // Wire drag-and-drop on modalDropZone
+  modalDropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    modalDropZone.style.borderColor = "#000";
   });
 
-  element.addEventListener('drop', (e) => {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    if (files && files.length > 0) {
-      if (modalOverlay.style.display !== 'flex') {
-        openModal();
-      }
-      validateAndSelectFile(files[0]);
+  modalDropZone.addEventListener("dragleave", () => {
+    modalDropZone.style.borderColor = "";
+  });
+
+  modalDropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    modalDropZone.style.borderColor = "";
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFile(e.dataTransfer.files[0]);
     }
   });
 }
 
-bindDragEvents(mainDropZone);
-bindDragEvents(modalDragZone);
-
-// Handle file input selection
-if (fileInput) {
-  fileInput.addEventListener('change', (e) => {
+if (pdfFileInput) {
+  pdfFileInput.addEventListener("change", (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      validateAndSelectFile(e.target.files[0]);
+      handleFile(e.target.files[0]);
     }
   });
 }
 
-// Start upload on button click
-if (uploadBtn) {
-  uploadBtn.addEventListener('click', async () => {
-    if (!selectedFile) {
-      showError('Please select a valid PDF file.');
-      return;
-    }
-    
-    try {
-      // Ensure user is signed in
-      const user = await authPromise;
-      const userId = user.uid;
-      
-      // Toggle loading screen
-      modalLoading.classList.remove('hidden');
-      modalFooter.classList.add('hidden');
-      
-      const timestamp = Date.now();
-      const storagePath = `uploads/${userId}/${timestamp}_${selectedFile.name}`;
-      const storageRef = ref(storage, storagePath);
-      
-      // 1. Upload bytes
-      modalLoadingText.textContent = "Uploading PDF...";
-      const snapshot = await uploadBytes(storageRef, selectedFile);
-      const downloadUrl = await getDownloadURL(snapshot.ref);
-      
-      // 2. Create Firestore document (this will trigger analyzePDF automatically via onCreate)
-      modalLoadingText.textContent = "Analyzing your PDF...";
-      const docRef = await addDoc(collection(db, 'documents'), {
-        userId: userId,
-        fileName: selectedFile.name,
-        fileSize: selectedFile.size,
-        uploadedAt: serverTimestamp(),
-        storageUrl: downloadUrl,
-        storagePath: storagePath,
-        status: "processing"
-      });
-      
-      console.log(`Document created with ID: ${docRef.id}`);
-      
-      // Redirect to editor
-      window.location.href = `/editor?docId=${docRef.id}`;
-    } catch (error) {
-      console.error("Upload process failed:", error);
-      showError(`Upload failed: ${error.message}`);
-      modalLoading.classList.add('hidden');
-      modalFooter.classList.remove('hidden');
+// Modal upload submit button (fallback)
+if (modalUploadBtn) {
+  modalUploadBtn.addEventListener("click", () => {
+    if (selectedFile) {
+      handleFile(selectedFile);
+    } else {
+      pdfFileInput.click();
     }
   });
 }

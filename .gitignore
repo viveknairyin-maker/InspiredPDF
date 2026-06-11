@@ -5,3 +5,5 @@ inspiredpdf/public/node_modules/
 .env
 *.local
 .firebaserc
+*.log
+

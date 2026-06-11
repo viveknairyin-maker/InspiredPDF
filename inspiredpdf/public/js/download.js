@@ -1,5 +1,5 @@
 import { functions } from './app.js';
-import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
+import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
 
 const downloadBtn = document.getElementById('download-pdf-btn');
 const toast = document.getElementById('toast');

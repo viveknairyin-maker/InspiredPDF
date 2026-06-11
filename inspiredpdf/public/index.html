@@ -190,11 +190,12 @@
             </div>
             <!-- Central Action Area -->
             <div class="max-w-2xl mx-auto flex flex-col items-center">
-                <button id="upload-start-btn" class="bg-primary text-on-primary px-xl py-lg rounded-lg font-headline-md text-headline-md btn-primary transition-all duration-150 mb-md active:scale-95">
+                <!-- Enforce Fix 3: uploadBtn -->
+                <button id="uploadBtn" class="bg-primary text-on-primary px-xl py-lg rounded-lg font-headline-md text-headline-md btn-primary transition-all duration-150 mb-md active:scale-95">
                     Upload PDF to Start
                 </button>
-                <!-- Upload Zone -->
-                <div class="w-full h-48 upload-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer hover:bg-surface-container-low group" id="drop-zone">
+                <!-- Upload Zone - Enforce Fix 3: dropZone -->
+                <div class="w-full h-48 upload-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer hover:bg-surface-container-low group" id="dropZone">
                     <div class="text-center">
                         <span class="material-symbols-outlined text-primary text-5xl mb-sm block group-hover:scale-110 transition-transform">upload_file</span>
                         <p class="font-label-bold text-label-bold uppercase text-secondary">or drag &amp; drop your PDF here</p>
@@ -290,23 +291,25 @@
         </div>
     </footer>
 
-    <!-- MODAL OVERLAY -->
+    <!-- MODAL OVERLAY - Enforce Fix 3: modalOverlay with display:none by default -->
     <div class="fixed inset-0 z-50 flex items-center justify-center overlay-stipple p-margin-mobile" id="modalOverlay" style="display: none;">
         <!-- MODAL CONTAINER -->
         <div class="relative w-full max-w-lg bg-white border-2 border-primary modal-shadow-block animate-in fade-in zoom-in duration-200">
             <!-- HEADER -->
             <header class="flex items-center justify-between px-lg py-md border-b border-primary">
                 <h2 class="font-headline-md text-headline-md text-primary">Upload Your PDF</h2>
-                <button class="p-xs hover:bg-surface-container-highest transition-colors" id="closeBtn">
+                <!-- Enforce Fix 3: modalClose -->
+                <button class="p-xs hover:bg-surface-container-highest transition-colors" id="modalClose">
                     <span class="material-symbols-outlined text-primary">close</span>
                 </button>
             </header>
             
             <!-- CONTENT -->
             <div class="p-lg relative">
-                <!-- Upload Area -->
-                <label class="drag-zone group flex flex-col items-center justify-center w-full h-64 cursor-pointer bg-surface hover:bg-surface-container-low" for="fileUpload" id="modal-drag-zone">
-                    <input accept=".pdf" class="hidden" id="fileUpload" type="file"/>
+                <!-- Upload Area - Enforce Fix 4: modalDropZone -->
+                <label class="drag-zone group flex flex-col items-center justify-center w-full h-64 cursor-pointer bg-surface hover:bg-surface-container-low" for="pdfFileInput" id="modalDropZone">
+                    <!-- Enforce Fix 4: pdfFileInput -->
+                    <input accept=".pdf" id="pdfFileInput" type="file" style="display: none;"/>
                     <div class="flex flex-col items-center justify-center space-y-md">
                         <div class="w-16 h-16 border border-primary flex items-center justify-center bg-white group-hover:bg-primary group-hover:text-white transition-colors">
                             <span class="material-symbols-outlined text-[32px]">upload_file</span>
@@ -335,7 +338,7 @@
             
             <!-- FOOTER / PRIMARY ACTION -->
             <footer class="p-lg pt-0" id="modalFooter">
-                <button class="primary-btn w-full py-md font-label-bold text-label-bold flex items-center justify-center gap-sm active:scale-95" id="uploadBtn">
+                <button class="primary-btn w-full py-md font-label-bold text-label-bold flex items-center justify-center gap-sm active:scale-95" id="modalUploadBtn">
                     Upload &amp; Start Editing
                     <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </button>
@@ -349,18 +352,7 @@
         </div>
     </div>
 
-    <!-- Firebase configuration & scripts -->
-    <script type="importmap">
-      {
-        "imports": {
-          "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-          "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-          "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
-          "firebase/storage": "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js"
-        }
-      }
-    </script>
-    <script type="module" src="js/app.js"></script>
-    <script type="module" src="js/upload.js"></script>
+    <!-- Enforce Fix 6: Absolute module load -->
+    <script type="module" src="/js/upload.js"></script>
 </body>
 </html>

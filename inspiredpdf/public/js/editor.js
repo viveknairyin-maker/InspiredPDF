@@ -1,6 +1,6 @@
 import { db, storage, authPromise } from './app.js';
-import { doc, collection, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { ref, getBytes } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+import { doc, collection, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { ref, getBytes } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 // Fetch document ID from URL
 const urlParams = new URLSearchParams(window.location.search);
