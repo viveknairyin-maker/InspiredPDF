@@ -1,6 +1,4 @@
-import { db, storage, authPromise } from './app.js';
-import { doc, collection, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { ref, getBytes } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getDocument, getEdits, saveEdit } from './app.js';
 
 // Fetch document ID from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -39,7 +37,6 @@ let pdfDoc = null;
 let currentPage = 1;
 let totalPages = 0;
 let scale = 1.0;
-let analysisTimeout = null;
 
 // Active editing state
 let activeEditingDiv = null;
@@ -134,81 +131,42 @@ function loadGoogleFont(fontFamily) {
   }
 }
 
-// Start document metadata listener
+// Start local document initialization
 async function initEditor() {
   populateFontDropdown();
   setActiveTool('selectEdit');
   
-  await authPromise;
-  
-  // Set analysis 30s timeout check (Task 5.2)
-  analysisTimeout = setTimeout(() => {
-    if (!analysis) {
-      editorLoadingScreen.classList.remove('hidden');
-      editorLoadingText.textContent = "Analysis is taking longer than expected. Please refresh.";
-      const spinner = editorLoadingScreen.querySelector('.animate-spin');
-      if (spinner) spinner.classList.add('hidden');
-    }
-  }, 30000);
-
-  // Subscribe to document metadata changes (Task 5.2)
-  const docRef = doc(db, 'documents', docId);
-  onSnapshot(docRef, async (snapshot) => {
-    if (!snapshot.exists()) {
-      alert("Document not found.");
+  try {
+    // 1. Fetch document from local IndexedDB
+    const docDataLocal = await getDocument(docId);
+    if (!docDataLocal) {
+      alert("Document not found locally. Redirecting to landing page.");
       window.location.href = '/';
       return;
     }
     
-    docData = snapshot.data();
+    docData = docDataLocal;
     docFilenameDisplay.textContent = docData.fileName || 'Untitled.pdf';
+    analysis = docData.analysis;
     
-    if (docData.status === 'processing') {
-      editorLoadingScreen.classList.remove('hidden');
-      editorLoadingText.textContent = "Analyzing your PDF... this may take up to 30 seconds.";
-    } else if (docData.status === 'ready' && docData.analysis && !analysis) {
-      clearTimeout(analysisTimeout);
-      analysis = docData.analysis;
-      
-      // Load edits subcollection
-      subscribeToEdits();
-      
-      // Load and render PDF
-      await loadPDF();
-    } else if (docData.status === 'error') {
-      clearTimeout(analysisTimeout);
-      editorLoadingText.textContent = `Analysis failed: ${docData.error || 'Unknown error'}`;
-      const spinner = editorLoadingScreen.querySelector('.animate-spin');
-      if (spinner) spinner.classList.add('hidden');
-    }
-  });
+    // 2. Fetch existing edits from IndexedDB
+    docEdits = await getEdits(docId);
+    
+    // 3. Render PDF pages
+    await loadPDF();
+  } catch (error) {
+    console.error("Local editor initialization failed:", error);
+    alert("Failed to load editor: " + error.message);
+    window.location.href = '/';
+  }
 }
 
-// Load edits subcollection in real time
-function subscribeToEdits() {
-  const editsRef = collection(db, 'documents', docId, 'edits');
-  onSnapshot(editsRef, (snapshot) => {
-    docEdits = {};
-    snapshot.forEach(docSnap => {
-      docEdits[docSnap.id] = docSnap.data();
-    });
-    
-    // Re-render the page to apply changes
-    if (pdfDoc) {
-      renderPage(currentPage);
-    }
-  });
-}
-
-// Download PDF bytes and load PDF.js (Task 5.3)
+// Load PDF document from local ArrayBuffer
 async function loadPDF() {
   try {
     editorLoadingText.textContent = "Loading PDF viewer...";
     
-    const fileRef = ref(storage, docData.storagePath);
-    const bytes = await getBytes(fileRef);
-    
-    // Load PDF document
+    const bytes = new Uint8Array(docData.fileBytes);
     pdfDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
     totalPages = pdfDoc.numPages;
     
@@ -225,7 +183,7 @@ async function loadPDF() {
   }
 }
 
-// Render page canvas (Task 5.4)
+// Render page canvas
 async function renderPage(pageNumber) {
   if (!pdfDoc || !analysis) return;
   
@@ -265,14 +223,14 @@ async function renderPage(pageNumber) {
   };
   await page.render(renderContext).promise;
   
-  // Render overlay elements (Task 5.5)
+  // Render overlay elements
   renderOverlays(pageNumber, scale, analysisPage.height);
   
   // Update bottom page indicators
   pageInfo.textContent = `PAGE ${pageNumber} OF ${totalPages}`;
 }
 
-// Render overlays (Task 5.5)
+// Render overlays
 function renderOverlays(pageNumber, scale, pageHeight) {
   const analysisPage = analysis.pages[pageNumber - 1];
   
@@ -293,7 +251,7 @@ function renderOverlays(pageNumber, scale, pageHeight) {
     const edit = docEdits[blockId];
     
     const overlay = document.createElement('div');
-    overlay.className = 'pdf-overlay pointer-events-auto'; // Enforce Task 5.5 class
+    overlay.className = 'pdf-overlay pointer-events-auto';
     overlay.dataset.blockId = blockId;
     
     // Position using scaled top-left coordinates
@@ -319,13 +277,13 @@ function renderOverlays(pageNumber, scale, pageHeight) {
     overlay.style.fontStyle = edit ? edit.fontStyle : block.fontStyle;
     
     if (edit) {
-      // Redact original text: solid white background and visible edited text
+      // Redact original text
       overlay.style.backgroundColor = '#ffffff';
       overlay.style.color = edit.color || '#000000';
       overlay.style.textDecoration = edit.underline ? 'underline' : 'none';
       overlay.innerText = edit.text;
     } else {
-      // Transparent overlay to reveal original PDF text underneath
+      // Transparent overlay
       overlay.style.backgroundColor = 'transparent';
       overlay.style.color = 'transparent';
       overlay.innerText = block.text;
@@ -340,9 +298,9 @@ function renderOverlays(pageNumber, scale, pageHeight) {
   });
 }
 
-// In-place Text Editing Initiator (Task 5.6)
+// In-place Text Editing Initiator
 function activateEditBlock(block, scale) {
-  closeEditing(); // Close any currently active edit
+  closeEditing();
   
   setActiveTool('selectEdit');
   
@@ -354,12 +312,10 @@ function activateEditBlock(block, scale) {
   activeBlockId = blockId;
   activeBlockObj = block;
   
-  // Hide overlay div
   overlayDiv.classList.add('invisible');
   
   const edit = docEdits[blockId];
   
-  // Create contenteditable div
   const editDiv = document.createElement('div');
   editDiv.className = 'text-block-editing';
   editDiv.contentEditable = 'true';
@@ -380,7 +336,6 @@ function activateEditBlock(block, scale) {
   document.getElementById('overlays').appendChild(editDiv);
   activeEditingDiv = editDiv;
   
-  // Focus and select all content
   editDiv.focus();
   const range = document.createRange();
   range.selectNodeContents(editDiv);
@@ -388,10 +343,8 @@ function activateEditBlock(block, scale) {
   sel.removeAllRanges();
   sel.addRange(range);
   
-  // Show and position floating toolbar
   positionToolbar(editDiv);
   
-  // Bind live inputs
   editDiv.addEventListener('input', () => {
     triggerEditSave();
   });
@@ -419,18 +372,14 @@ function updateToolbarControls() {
   const blockId = activeBlockId;
   const edit = docEdits[blockId];
   
-  // Font family dropdown
   const fontFamily = edit ? edit.fontFamily : activeBlockObj.matchedGoogleFont;
   fontFamilySelect.value = fontFamily;
   
-  // Font size
   const fontSize = edit ? edit.fontSize : activeBlockObj.fontSize;
   fontSizeInput.value = Math.round(fontSize);
   
-  // Update styling buttons selection states
   updateToolbarState();
   
-  // Color Swatch
   const color = edit ? (edit.color || '#000000') : '#000000';
   colorSwatchBtn.style.backgroundColor = color;
   colorHexInput.value = color.replace('#', '');
@@ -452,16 +401,21 @@ function updateToolbarState() {
   underlineBtn.classList.toggle('text-on-primary', isUnderline);
 }
 
-// Close active edit, remove contenteditable and save final states
+// Close active edit and save final states
 function closeEditing() {
   if (activeEditingDiv) {
     const text = activeEditingDiv.innerText;
     if (text !== '') {
-      triggerEditSave(true); // Save immediately
+      triggerEditSave(true);
     }
     
     activeEditingDiv.remove();
     activeEditingDiv = null;
+    
+    // Visually refresh the overlays to show redacted text in the canvas
+    setTimeout(() => {
+      renderPage(currentPage);
+    }, 100);
   }
   
   if (activeOverlayDiv) {
@@ -475,7 +429,7 @@ function closeEditing() {
   activeBlockObj = null;
 }
 
-// Real-time debounced edits write (Task 5.6.h)
+// Real-time debounced edits write
 let debounceTimer = null;
 function triggerEditSave(immediate = false) {
   if (!activeEditingDiv || !activeBlockObj || !activeBlockId) return;
@@ -490,38 +444,41 @@ function triggerEditSave(immediate = false) {
   const color = colorSwatchBtn.style.backgroundColor || '#000000';
   const underline = activeEditingDiv.style.textDecoration === 'underline';
   
-  const save = async () => {
-    // Check color format (converts rgb(...) to hex)
-    let hexColor = color;
-    if (color.startsWith('rgb')) {
-      const parts = color.match(/\d+/g);
-      if (parts && parts.length >= 3) {
-        const r = parseInt(parts[0]).toString(16).padStart(2, '0');
-        const g = parseInt(parts[1]).toString(16).padStart(2, '0');
-        const b = parseInt(parts[2]).toString(16).padStart(2, '0');
-        hexColor = `#${r}${g}${b}`;
-      }
+  // Convert rgb(...) to hex
+  let hexColor = color;
+  if (color.startsWith('rgb')) {
+    const parts = color.match(/\d+/g);
+    if (parts && parts.length >= 3) {
+      const r = parseInt(parts[0]).toString(16).padStart(2, '0');
+      const g = parseInt(parts[1]).toString(16).padStart(2, '0');
+      const b = parseInt(parts[2]).toString(16).padStart(2, '0');
+      hexColor = `#${r}${g}${b}`;
     }
-    
+  }
+  
+  const editPayload = {
+    text: text,
+    fontSize: fontSize,
+    fontFamily: fontFamily,
+    fontWeight: fontWeight,
+    fontStyle: fontStyle,
+    color: hexColor,
+    underline: underline,
+    x: activeBlockObj.x,
+    y: activeBlockObj.y,
+    width: activeBlockObj.width,
+    height: activeBlockObj.height,
+    pageNumber: currentPage
+  };
+
+  // Cache in local memory
+  docEdits[activeBlockId] = editPayload;
+  
+  const save = async () => {
     try {
-      const editRef = doc(db, 'documents', docId, 'edits', activeBlockId);
-      // Enforce Task 5.6.h Firestore edit payload exactly
-      await setDoc(editRef, {
-        text: text,
-        fontSize: fontSize,
-        fontFamily: fontFamily,
-        fontWeight: fontWeight,
-        fontStyle: fontStyle,
-        color: hexColor,
-        underline: underline,
-        x: activeBlockObj.x,
-        y: activeBlockObj.y,
-        width: activeBlockObj.width,
-        height: activeBlockObj.height,
-        pageNumber: currentPage
-      }, { merge: true });
+      await saveEdit(docId, activeBlockId, editPayload);
     } catch (e) {
-      console.error("Failed to save edit to Firestore:", e);
+      console.error("Failed to save edit locally:", e);
     }
   };
   
@@ -532,7 +489,7 @@ function triggerEditSave(immediate = false) {
   }
 }
 
-// Floating Toolbar controls bindings (Task 5.7)
+// Floating Toolbar controls bindings
 fontFamilySelect.onchange = () => {
   if (activeEditingDiv) {
     const font = fontFamilySelect.value;
@@ -582,7 +539,6 @@ colorSwatchBtn.onclick = (e) => {
   colorPickerPopover.classList.toggle('hidden');
 };
 
-// Swatches selection inside custom popover
 colorPickerPopover.querySelectorAll('[data-color]').forEach(btn => {
   btn.onclick = () => {
     const color = btn.dataset.color;
@@ -619,12 +575,11 @@ window.addEventListener('mousedown', (e) => {
   }
 });
 
-// Prevent toolbar clicks from blurring active inputs
 floatingToolbar.addEventListener('mousedown', (e) => {
   e.stopPropagation();
 });
 
-// Page Navigation Bindings (Task 5.9)
+// Page Navigation Bindings
 prevPageBtn.onclick = () => {
   if (currentPage > 1) {
     currentPage--;
