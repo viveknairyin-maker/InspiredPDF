@@ -268,7 +268,14 @@
     <!-- pdf-lib CDN -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 
-    <!-- Firebase Config & Scripts (Task 6) -->
+    <!-- Gemini API Key configuration -->
+    <script>
+      // Gemini API key injected at runtime
+      window.GEMINI_API_KEY = "__GEMINI_API_KEY__";
+    </script>
+    <!-- Local config fallback -->
+    <script src="/js/config.js"></script>
+
     <script type="module" src="/js/editor.js"></script>
     <script type="module" src="/js/download.js"></script>
 </body>

@@ -1,18 +1,45 @@
-import { db, storage, authPromise } from './app.js';
-import { doc, collection, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { ref, getBytes } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getPDFFromIDB } from './app.js';
 
-// Fetch document ID from URL
-const urlParams = new URLSearchParams(window.location.search);
-const docId = urlParams.get('docId');
+// Load PDF from sessionStorage/IndexedDB
+const pdfDataUrl = sessionStorage.getItem("inspiredpdf_data");
+const pdfStorageType = sessionStorage.getItem("inspiredpdf_storage");
+const pdfFileName = sessionStorage.getItem("inspiredpdf_filename") || "document.pdf";
 
-if (!docId) {
-  alert("No document ID specified. Redirecting to landing page.");
-  window.location.href = '/';
+if (!pdfDataUrl && pdfStorageType !== "indexeddb") {
+  window.location.href = "/";
+}
+
+// Convert base64 dataURL to Uint8Array for PDF.js
+function dataURLToUint8Array(dataURL) {
+  const base64 = dataURL.split(",")[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// Load the PDF bytes
+async function loadPDFBytes() {
+  if (pdfStorageType === "indexeddb") {
+    const bytes = await getPDFFromIDB();
+    if (!bytes) {
+      throw new Error("No PDF bytes found in IndexedDB");
+    }
+    return new Uint8Array(bytes);
+  } else {
+    return dataURLToUint8Array(pdfDataUrl);
+  }
+}
+
+// Update filename in header
+const docFilenameDisplay = document.getElementById('doc-filename-display') || document.getElementById("pdfFileName");
+if (docFilenameDisplay) {
+  docFilenameDisplay.textContent = pdfFileName;
 }
 
 // DOM Elements
-const docFilenameDisplay = document.getElementById('doc-filename-display');
 const canvasContainer = document.getElementById('canvas-container');
 const prevPageBtn = document.getElementById('prev-page-btn');
 const nextPageBtn = document.getElementById('next-page-btn');
@@ -31,15 +58,11 @@ const colorSwatchBtn = document.getElementById('color-swatch-btn');
 const colorPickerPopover = document.getElementById('color-picker-popover');
 const colorHexInput = document.getElementById('color-hex-input');
 
-// Editor state
-let docData = null;
-let analysis = null;
-let docEdits = {};
+// Editor local state refs (pointing to window.InspiredPDF)
 let pdfDoc = null;
 let currentPage = 1;
 let totalPages = 0;
 let scale = 1.0;
-let analysisTimeout = null;
 
 // Active editing state
 let activeEditingDiv = null;
@@ -50,10 +73,9 @@ let activeBlockObj = null;
 // Common Google Fonts to pre-populate the toolbar list
 const COMMON_GOOGLE_FONTS = [
   'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 
-  'Poppins', 'Oswald', 'Source Sans Pro', 'Slabo 27px', 
-  'Raleway', 'PT Sans', 'Merriweather', 'Lora', 'Noto Sans',
-  'Nunito', 'Playfair Display', 'Ubuntu', 'Roboto Mono', 
-  'Arimo', 'Rubik'
+  'Poppins', 'Oswald', 'Source Sans Pro', 'Raleway', 'PT Sans', 
+  'Merriweather', 'Lora', 'Noto Sans', 'Nunito', 'Playfair Display', 
+  'Ubuntu', 'Roboto Mono', 'Arimo', 'Rubik', 'DM Sans', 'JetBrains Mono'
 ];
 
 // Sidebar tools binding
@@ -104,13 +126,14 @@ if (sidebarTools.boldItalic) {
       const isBold = activeEditingDiv.style.fontWeight === 'bold';
       activeEditingDiv.style.fontWeight = isBold ? 'normal' : 'bold';
       updateToolbarState();
-      triggerEditSave();
+      triggerEditSave(true);
     }
   };
 }
 
 // Populate font families in toolbar
 function populateFontDropdown() {
+  if (!fontFamilySelect) return;
   fontFamilySelect.innerHTML = '';
   COMMON_GOOGLE_FONTS.forEach(font => {
     const opt = document.createElement('option');
@@ -133,122 +156,206 @@ function loadGoogleFont(fontName) {
   }
 }
 
-// Start document metadata listener
+// Batched Gemini Font Analysis Call (Browser-Side)
+async function analyzeFonts(uniqueFontNames) {
+  const apiKey = window.GEMINI_API_KEY;
+  if (!apiKey || apiKey === "__GEMINI_API_KEY__") {
+    console.warn("No valid GEMINI_API_KEY found. Font matching disabled.");
+    const fallback = {};
+    uniqueFontNames.forEach(f => fallback[f] = "Inter");
+    return fallback;
+  }
+
+  const fontList = uniqueFontNames.join("\n");
+  
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `You are a typography expert. Below is a list of internal PDF font names.
+For each font name, return the closest matching Google Font from fonts.google.com.
+
+Rules:
+- Helvetica, Arial, or similar sans → "Inter"
+- Times New Roman, serif variants → "Merriweather"  
+- Geometric sans (Futura, Avenir) → "DM Sans"
+- Monospace fonts → "JetBrains Mono"
+- Display or decorative → "Playfair Display"
+- Unknown → "Inter"
+
+Font names:
+${fontList}
+
+Reply ONLY with a JSON object where keys are the original font names 
+and values are the matched Google Font names. No explanation. 
+Example: {"AAAAAB+Helvetica": "Inter", "TimesNewRoman": "Merriweather"}`
+            }]
+          }]
+        })
+      }
+    );
+    
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "{}";
+    const clean = text.replace(/```json|```/g, "").trim();
+    const fontMap = JSON.parse(clean);
+    
+    // Fill in any missing fonts with Inter
+    uniqueFontNames.forEach(f => {
+      if (!fontMap[f]) fontMap[f] = "Inter";
+    });
+    
+    return fontMap;
+  } catch (err) {
+    console.warn("Font analysis failed, using defaults:", err);
+    const fallback = {};
+    uniqueFontNames.forEach(f => fallback[f] = "Inter");
+    return fallback;
+  }
+}
+
+// Start local editor initialization
 async function initEditor() {
   populateFontDropdown();
   setActiveTool('selectEdit');
   
-  await authPromise;
-  
-  // Set analysis 30s timeout check
-  analysisTimeout = setTimeout(() => {
-    if (!analysis) {
-      editorLoadingScreen.classList.remove('hidden');
-      editorLoadingText.textContent = "Analysis is taking longer than expected. Please refresh.";
-      const spinner = editorLoadingScreen.querySelector('.animate-spin');
-      if (spinner) spinner.classList.add('hidden');
-    }
-  }, 30000);
+  try {
+    editorLoadingScreen.classList.remove('hidden');
+    editorLoadingText.textContent = "Loading local PDF...";
 
-  // Subscribe to document metadata changes
-  const docRef = doc(db, 'documents', docId);
-  onSnapshot(docRef, async (snapshot) => {
-    if (!snapshot.exists()) {
-      alert("Document not found.");
-      window.location.href = '/';
-      return;
-    }
+    const pdfBytes = await loadPDFBytes();
+    window.InspiredPDF.pdfBytes = pdfBytes;
     
-    docData = snapshot.data();
-    docFilenameDisplay.textContent = docData.fileName || 'Untitled.pdf';
-    
-    if (docData.status === 'processing') {
-      editorLoadingScreen.classList.remove('hidden');
-      editorLoadingText.textContent = "Analyzing your PDF... this may take up to 30 seconds.";
-    } else if (docData.status === 'ready' && docData.analysis && !analysis) {
-      clearTimeout(analysisTimeout);
-      analysis = docData.analysis;
-      
-      // Load edits subcollection
-      subscribeToEdits();
-      
-      // Load and render PDF
-      await loadPDF();
-    } else if (docData.status === 'error') {
-      clearTimeout(analysisTimeout);
-      editorLoadingText.textContent = `Analysis failed: ${docData.error || 'Unknown error'}`;
-      const spinner = editorLoadingScreen.querySelector('.animate-spin');
-      if (spinner) spinner.classList.add('hidden');
-    }
-  });
-}
+    // Initialize PDF.js local document
+    pdfDoc = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+    totalPages = pdfDoc.numPages;
+    window.InspiredPDF.pdfDoc = pdfDoc;
+    window.InspiredPDF.totalPages = totalPages;
 
-// Load edits subcollection in real time
-function subscribeToEdits() {
-  const editsRef = collection(db, 'documents', docId, 'edits');
-  onSnapshot(editsRef, (snapshot) => {
-    docEdits = {};
-    snapshot.forEach(docSnap => {
-      docEdits[docSnap.id] = docSnap.data();
+    editorLoadingText.textContent = "Analyzing fonts & layout... this may take a few seconds.";
+
+    // Perform Layout & Typography Analysis locally
+    const pages = [];
+    const uniqueFonts = new Set();
+    
+    for (let i = 1; i <= totalPages; i++) {
+      const page = await pdfDoc.getPage(i);
+      const viewport = page.getViewport({ scale: 1.0 });
+      const textContent = await page.getTextContent();
+      
+      const width = viewport.width;
+      const height = viewport.height;
+      const blocks = [];
+      
+      textContent.items.forEach((item, index) => {
+        if (!item.str || item.str.trim() === '') return;
+        
+        const transform = item.transform; // [scaleX, skewX, skewY, scaleY, transX, transY]
+        const x = transform[4];
+        const y = transform[5];
+        const fontSize = Math.sqrt(transform[0] * transform[0] + transform[1] * transform[1]);
+        const originalFont = item.fontName || 'Unknown';
+        
+        let fontName = originalFont;
+        try {
+          const fontObj = page.commonObjs.has(originalFont) ? page.commonObjs.get(originalFont) : null;
+          if (fontObj && fontObj.name) {
+            fontName = fontObj.name;
+          }
+        } catch (e) {
+          console.warn(`Could not resolve font name for ${originalFont}:`, e.message);
+        }
+        
+        let fontWeight = fontName.toLowerCase().includes("bold") ? "bold" : "normal";
+        let fontStyle = fontName.toLowerCase().includes("italic") ? "italic" : "normal";
+        
+        uniqueFonts.add(fontName);
+        
+        blocks.push({
+          id: `block_${i}_${index}`,
+          text: item.str,
+          x: x,
+          y: y,
+          width: item.width || 0,
+          height: item.height || fontSize,
+          fontSize: fontSize,
+          originalFont: fontName,
+          fontWeight: fontWeight,
+          fontStyle: fontStyle
+        });
+      });
+      
+      pages.push({
+        pageNumber: i,
+        width: width,
+        height: height,
+        blocks: blocks
+      });
+    }
+
+    // Call batched font mapper
+    const fontMapping = await analyzeFonts(Array.from(uniqueFonts));
+
+    // Construct analysis state payload
+    const pagesData = pages.map(page => {
+      const textBlocks = page.blocks.map(block => {
+        const matched = fontMapping[block.originalFont] || 'Inter';
+        return {
+          ...block,
+          matchedGoogleFont: matched
+        };
+      });
+      
+      return {
+        pageNumber: page.pageNumber,
+        width: page.width,
+        height: page.height,
+        textBlocks: textBlocks
+      };
     });
     
-    // Re-render the page to apply changes
-    if (pdfDoc) {
-      renderPage(currentPage);
-    }
-  });
-}
+    window.InspiredPDF.analysis = {
+      pages: pagesData
+    };
 
-// Download PDF bytes and load PDF.js
-async function loadPDF() {
-  try {
-    editorLoadingText.textContent = "Loading PDF viewer...";
-    
-    const fileRef = ref(storage, docData.storagePath);
-    const bytes = await getBytes(fileRef);
-    
-    // Load PDF document
-    pdfDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
-    totalPages = pdfDoc.numPages;
-    
-    // Hide loading screen
+    // Hide loading overlay
     editorLoadingScreen.classList.add('hidden');
     
     // Render first page
     renderPage(currentPage);
   } catch (error) {
-    console.error("Error loading PDF:", error);
-    editorLoadingText.textContent = `Error loading PDF: ${error.message}`;
+    console.error("Local editor initialization failed:", error);
+    editorLoadingText.textContent = `Editor initialization failed: ${error.message}`;
     const spinner = editorLoadingScreen.querySelector('.animate-spin');
     if (spinner) spinner.classList.add('hidden');
   }
 }
 
-// Render page canvas
+// Render page canvas locally
 async function renderPage(pageNumber) {
-  if (!pdfDoc || !analysis) return;
+  if (!pdfDoc || !window.InspiredPDF.analysis) return;
   
-  // Clean up existing elements
   closeEditing();
   canvasContainer.innerHTML = '';
   
-  // Get page info
   const page = await pdfDoc.getPage(pageNumber);
-  const analysisPage = analysis.pages.find(p => p.pageNumber === pageNumber);
+  const analysisPage = window.InspiredPDF.analysis.pages.find(p => p.pageNumber === pageNumber);
   if (!analysisPage) {
-    console.error(`No analysis data found for page ${pageNumber}`);
+    console.error(`No local analysis data found for page ${pageNumber}`);
     return;
   }
   
-  // Calculate scaling factor to fit our A4 container width
   scale = canvasContainer.clientWidth / analysisPage.width;
   const scaledViewport = page.getViewport({ scale: scale });
   
-  // Update page container dimensions
   canvasContainer.style.width = `${canvasContainer.clientWidth}px`;
   canvasContainer.style.height = `${analysisPage.height * scale}px`;
   
-  // Render PDF.js page onto canvas
   const canvas = document.createElement('canvas');
   canvas.width = scaledViewport.width;
   canvas.height = scaledViewport.height;
@@ -263,18 +370,17 @@ async function renderPage(pageNumber) {
   };
   await page.render(renderContext).promise;
   
-  // Render overlay elements
   renderOverlays(pageNumber, scale, analysisPage.height);
   
-  // Update page indicators
-  pageInfo.textContent = `PAGE ${pageNumber} OF ${totalPages}`;
+  if (pageInfo) {
+    pageInfo.textContent = `PAGE ${pageNumber} OF ${totalPages}`;
+  }
 }
 
-// Render overlays
+// Render local overlays
 function renderOverlays(pageNumber, scale, pageHeight) {
-  const analysisPage = analysis.pages[pageNumber - 1];
+  const analysisPage = window.InspiredPDF.analysis.pages[pageNumber - 1];
   
-  // Create relative overlays container
   const overlaysDiv = document.createElement('div');
   overlaysDiv.id = 'overlays';
   overlaysDiv.style.position = 'absolute';
@@ -288,13 +394,12 @@ function renderOverlays(pageNumber, scale, pageHeight) {
   
   analysisPage.textBlocks.forEach((block) => {
     const blockId = block.id;
-    const edit = docEdits[blockId];
+    const edit = window.InspiredPDF.edits[blockId];
     
     const overlay = document.createElement('div');
     overlay.className = 'pdf-overlay pointer-events-auto';
     overlay.dataset.blockId = blockId;
     
-    // Position using scaled top-left coordinates
     const left = block.x * scale;
     const top = (pageHeight - block.y - block.height) * scale;
     const width = block.width * scale;
@@ -307,7 +412,6 @@ function renderOverlays(pageNumber, scale, pageHeight) {
     overlay.style.height = `${height}px`;
     overlay.style.cursor = 'text';
     
-    // Dynamically load Google Font via link tag (Fix 1B.a)
     const fontName = edit ? edit.fontFamily : block.matchedGoogleFont;
     loadGoogleFont(fontName);
     
@@ -345,7 +449,6 @@ function renderOverlays(pageNumber, scale, pageHeight) {
 // In-place Text Editing Initiator
 function activateEditBlock(block, scale) {
   closeEditing();
-  
   setActiveTool('selectEdit');
   
   const blockId = block.id;
@@ -356,20 +459,17 @@ function activateEditBlock(block, scale) {
   activeBlockId = blockId;
   activeBlockObj = block;
   
-  // Hide static overlay text
   overlayDiv.classList.add('invisible');
   
   // Make sure background of original overlay is transparent (Fix 1A)
   overlayDiv.style.setProperty('background', 'transparent', 'important');
   overlayDiv.style.setProperty('background-color', 'transparent', 'important');
   
-  const edit = docEdits[blockId];
+  const edit = window.InspiredPDF.edits[blockId];
   const fontName = edit ? edit.fontFamily : block.matchedGoogleFont;
   
-  // Dynamically load Google Font (Fix 1B.a)
   loadGoogleFont(fontName);
   
-  // Create contenteditable div
   const editDiv = document.createElement('div');
   editDiv.className = 'text-block-editing';
   editDiv.contentEditable = 'true';
@@ -404,7 +504,6 @@ function activateEditBlock(block, scale) {
   document.getElementById('overlays').appendChild(editDiv);
   activeEditingDiv = editDiv;
   
-  // Focus and select all content
   editDiv.focus();
   const range = document.createRange();
   range.selectNodeContents(editDiv);
@@ -439,7 +538,7 @@ function updateToolbarControls() {
   if (!activeEditingDiv || !activeBlockObj) return;
   
   const blockId = activeBlockId;
-  const edit = docEdits[blockId];
+  const edit = window.InspiredPDF.edits[blockId];
   
   const fontFamily = edit ? edit.fontFamily : activeBlockObj.matchedGoogleFont;
   fontFamilySelect.value = fontFamily;
@@ -460,14 +559,18 @@ function updateToolbarState() {
   const isItalic = activeEditingDiv.style.fontStyle === 'italic';
   const isUnderline = activeEditingDiv.style.textDecoration === 'underline';
   
-  boldBtn.classList.toggle('bg-primary', isBold);
-  boldBtn.classList.toggle('text-on-primary', isBold);
-  
-  italicBtn.classList.toggle('bg-primary', isItalic);
-  italicBtn.classList.toggle('text-on-primary', isItalic);
-  
-  underlineBtn.classList.toggle('bg-primary', isUnderline);
-  underlineBtn.classList.toggle('text-on-primary', isUnderline);
+  if (boldBtn) {
+    boldBtn.classList.toggle('bg-primary', isBold);
+    boldBtn.classList.toggle('text-on-primary', isBold);
+  }
+  if (italicBtn) {
+    italicBtn.classList.toggle('bg-primary', isItalic);
+    italicBtn.classList.toggle('text-on-primary', isItalic);
+  }
+  if (underlineBtn) {
+    underlineBtn.classList.toggle('bg-primary', isUnderline);
+    underlineBtn.classList.toggle('text-on-primary', isUnderline);
+  }
 }
 
 // Close active edit, remove contenteditable and save final states
@@ -487,18 +590,15 @@ function closeEditing() {
     activeOverlayDiv = null;
   }
   
-  floatingToolbar.style.display = 'none';
-  colorPickerPopover.classList.add('hidden');
+  if (floatingToolbar) floatingToolbar.style.display = 'none';
+  if (colorPickerPopover) colorPickerPopover.classList.add('hidden');
   activeBlockId = null;
   activeBlockObj = null;
 }
 
-// Real-time debounced edits write
-let debounceTimer = null;
+// Real-time debounced edits write (local memory object)
 function triggerEditSave(immediate = false) {
   if (!activeEditingDiv || !activeBlockObj || !activeBlockId) return;
-  
-  clearTimeout(debounceTimer);
   
   const text = activeEditingDiv.innerText;
   const fontSize = parseFloat(fontSizeInput.value);
@@ -520,139 +620,159 @@ function triggerEditSave(immediate = false) {
     }
   }
   
-  const save = async () => {
-    try {
-      const editRef = doc(db, 'documents', docId, 'edits', activeBlockId);
-      await setDoc(editRef, {
-        text: text,
-        fontSize: fontSize,
-        fontFamily: fontFamily,
-        fontWeight: fontWeight,
-        fontStyle: fontStyle,
-        color: hexColor,
-        underline: underline,
-        x: activeBlockObj.x,
-        y: activeBlockObj.y,
-        width: activeBlockObj.width,
-        height: activeBlockObj.height,
-        pageNumber: currentPage
-      }, { merge: true });
-    } catch (e) {
-      console.error("Failed to save edit to Firestore:", e);
-    }
+  window.InspiredPDF.edits[activeBlockId] = {
+    text: text,
+    fontSize: fontSize,
+    fontFamily: fontFamily,
+    fontWeight: fontWeight,
+    fontStyle: fontStyle,
+    color: hexColor,
+    underline: underline,
+    x: activeBlockObj.x,
+    y: activeBlockObj.y,
+    width: activeBlockObj.width,
+    height: activeBlockObj.height,
+    pageNumber: currentPage
   };
-  
-  if (immediate) {
-    save();
-  } else {
-    debounceTimer = setTimeout(save, 500);
+
+  // Sync back to overlay Div immediately for live changes in editor view
+  if (activeOverlayDiv) {
+    activeOverlayDiv.innerText = text;
+    activeOverlayDiv.style.fontFamily = `'${fontFamily}', sans-serif`;
+    activeOverlayDiv.style.fontSize = `${fontSize * scale}px`;
+    activeOverlayDiv.style.fontWeight = fontWeight;
+    activeOverlayDiv.style.fontStyle = fontStyle;
+    activeOverlayDiv.style.color = hexColor;
+    activeOverlayDiv.style.textDecoration = underline ? 'underline' : 'none';
   }
 }
 
 // Floating Toolbar controls bindings
-fontFamilySelect.onchange = () => {
-  if (activeEditingDiv) {
-    const font = fontFamilySelect.value;
-    loadGoogleFont(font);
-    activeEditingDiv.style.fontFamily = `"${font}", sans-serif`;
-    triggerEditSave();
-  }
-};
-
-fontSizeInput.oninput = () => {
-  if (activeEditingDiv) {
-    const size = parseFloat(fontSizeInput.value);
-    activeEditingDiv.style.fontSize = `${size * scale}px`;
-    triggerEditSave();
-  }
-};
-
-boldBtn.onclick = () => {
-  if (activeEditingDiv) {
-    const isBold = activeEditingDiv.style.fontWeight === 'bold';
-    activeEditingDiv.style.fontWeight = isBold ? 'normal' : 'bold';
-    updateToolbarState();
-    triggerEditSave();
-  }
-};
-
-italicBtn.onclick = () => {
-  if (activeEditingDiv) {
-    const isItalic = activeEditingDiv.style.fontStyle === 'italic';
-    activeEditingDiv.style.fontStyle = isItalic ? 'normal' : 'italic';
-    updateToolbarState();
-    triggerEditSave();
-  }
-};
-
-underlineBtn.onclick = () => {
-  if (activeEditingDiv) {
-    const isUnderline = activeEditingDiv.style.textDecoration === 'underline';
-    activeEditingDiv.style.textDecoration = isUnderline ? 'none' : 'underline';
-    updateToolbarState();
-    triggerEditSave();
-  }
-};
-
-colorSwatchBtn.onclick = (e) => {
-  e.stopPropagation();
-  colorPickerPopover.classList.toggle('hidden');
-};
-
-colorPickerPopover.querySelectorAll('[data-color]').forEach(btn => {
-  btn.onclick = () => {
-    const color = btn.dataset.color;
-    colorSwatchBtn.style.backgroundColor = color;
-    colorHexInput.value = color.replace('#', '');
+if (fontFamilySelect) {
+  fontFamilySelect.onchange = () => {
     if (activeEditingDiv) {
-      activeEditingDiv.style.color = color;
+      const font = fontFamilySelect.value;
+      loadGoogleFont(font);
+      activeEditingDiv.style.fontFamily = `"${font}", sans-serif`;
       triggerEditSave();
     }
-    colorPickerPopover.classList.add('hidden');
   };
-});
+}
 
-colorHexInput.oninput = () => {
-  const hex = colorHexInput.value.replace('#', '');
-  if (hex.length === 6) {
-    const color = `#${hex}`;
-    colorSwatchBtn.style.backgroundColor = color;
+if (fontSizeInput) {
+  fontSizeInput.oninput = () => {
     if (activeEditingDiv) {
-      activeEditingDiv.style.color = color;
+      const size = parseFloat(fontSizeInput.value);
+      activeEditingDiv.style.fontSize = `${size * scale}px`;
       triggerEditSave();
     }
-  }
-};
+  };
+}
+
+if (boldBtn) {
+  boldBtn.onclick = () => {
+    if (activeEditingDiv) {
+      const isBold = activeEditingDiv.style.fontWeight === 'bold';
+      activeEditingDiv.style.fontWeight = isBold ? 'normal' : 'bold';
+      updateToolbarState();
+      triggerEditSave();
+    }
+  };
+}
+
+if (italicBtn) {
+  italicBtn.onclick = () => {
+    if (activeEditingDiv) {
+      const isItalic = activeEditingDiv.style.fontStyle === 'italic';
+      activeEditingDiv.style.fontStyle = isItalic ? 'normal' : 'italic';
+      updateToolbarState();
+      triggerEditSave();
+    }
+  };
+}
+
+if (underlineBtn) {
+  underlineBtn.onclick = () => {
+    if (activeEditingDiv) {
+      const isUnderline = activeEditingDiv.style.textDecoration === 'underline';
+      activeEditingDiv.style.textDecoration = isUnderline ? 'none' : 'underline';
+      updateToolbarState();
+      triggerEditSave();
+    }
+  };
+}
+
+if (colorSwatchBtn) {
+  colorSwatchBtn.onclick = (e) => {
+    e.stopPropagation();
+    if (colorPickerPopover) colorPickerPopover.classList.toggle('hidden');
+  };
+}
+
+if (colorPickerPopover) {
+  colorPickerPopover.querySelectorAll('[data-color]').forEach(btn => {
+    btn.onclick = () => {
+      const color = btn.dataset.color;
+      colorSwatchBtn.style.backgroundColor = color;
+      if (colorHexInput) colorHexInput.value = color.replace('#', '');
+      if (activeEditingDiv) {
+        activeEditingDiv.style.color = color;
+        triggerEditSave();
+      }
+      colorPickerPopover.classList.add('hidden');
+    };
+  });
+}
+
+if (colorHexInput) {
+  colorHexInput.oninput = () => {
+    const hex = colorHexInput.value.replace('#', '');
+    if (hex.length === 6) {
+      const color = `#${hex}`;
+      colorSwatchBtn.style.backgroundColor = color;
+      if (activeEditingDiv) {
+        activeEditingDiv.style.color = color;
+        triggerEditSave();
+      }
+    }
+  };
+}
 
 // Close editing if user clicks outside of editing container or toolbar
 window.addEventListener('mousedown', (e) => {
   if (activeEditingDiv) {
     if (!activeEditingDiv.contains(e.target) && 
-        !floatingToolbar.contains(e.target) && 
-        !colorPickerPopover.contains(e.target)) {
+        !(floatingToolbar && floatingToolbar.contains(e.target)) && 
+        !(colorPickerPopover && colorPickerPopover.contains(e.target))) {
       closeEditing();
     }
   }
 });
 
-floatingToolbar.addEventListener('mousedown', (e) => {
-  e.stopPropagation();
-});
+if (floatingToolbar) {
+  floatingToolbar.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+  });
+}
 
 // Page Navigation Bindings
-prevPageBtn.onclick = () => {
-  if (currentPage > 1) {
-    currentPage--;
-    renderPage(currentPage);
-  }
-};
+if (prevPageBtn) {
+  prevPageBtn.onclick = () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderPage(currentPage);
+    }
+  };
+}
 
-nextPageBtn.onclick = () => {
-  if (currentPage < totalPages) {
-    currentPage++;
-    renderPage(currentPage);
-  }
-};
+if (nextPageBtn) {
+  nextPageBtn.onclick = () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderPage(currentPage);
+    }
+  };
+}
 
 // Start the page logic
 initEditor();

@@ -6,4 +6,5 @@ inspiredpdf/public/node_modules/
 *.local
 .firebaserc
 *.log
-
+inspiredpdf/public/js/config.js
+functions/node_modules/

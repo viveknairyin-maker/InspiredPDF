@@ -1,9 +1,5 @@
 {
-  "cleanUrls": false,
   "rewrites": [
-    { "source": "/editor", "destination": "/public/editor.html" },
-    { "source": "/js/:path*", "destination": "/public/js/:path*" },
-    { "source": "/", "destination": "/public/index.html" },
-    { "source": "/:path*", "destination": "/public/:path*" }
+    { "source": "/editor", "destination": "/editor.html" }
   ]
 }
